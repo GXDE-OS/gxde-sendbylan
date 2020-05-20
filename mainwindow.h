@@ -3,7 +3,7 @@
 
 #include <DMainWindow>
 #include "widget.h"
-
+#include "config.h"
 DWIDGET_USE_NAMESPACE
 
 class MainWindow : public DMainWindow

@@ -17,11 +17,11 @@ int main(int argc, char *argv[])
     a.setAttribute(Qt::AA_UseHighDpiPixmaps);
     a.loadTranslator();
     a.setOrganizationName("free");
-    a.setApplicationVersion(DApplication::buildVersion("1.4"));
+    a.setApplicationVersion(DApplication::buildVersion(VERSON));
     a.setApplicationAcknowledgementPage("QQ:2684053139");
-    a.setProductIcon(QIcon("/opt/SendByLAN/folder.svg"));  //设置Logo
-    a.setProductName("共享文件夹");
-    a.setApplicationName("共享文件夹"); //只有在这儿修改窗口标题才有效
+    a.setProductIcon(QIcon(PATH_ICON));  //设置Logo
+    a.setProductName(MAIN_TITLE);
+    a.setApplicationName(MAIN_TITLE); //只有在这儿修改窗口标题才有效
     //模拟文件锁
     std::fstream lock;
     lock.open("/tmp/http.sh",std::ios::in);
@@ -55,14 +55,11 @@ int main(int argc, char *argv[])
     //写入运行脚本
     std::fstream outhttp;
     outhttp.open("/tmp/http.sh",std::fstream::out);
-    outhttp<<"cd ";
+    outhttp<<"cd /opt/SendByLAN\n";
     qDebug()<<sizeof (&argv)/sizeof (argv[1]);
+    outhttp<<"/opt/SendByLAN/main.py 8080 ";
     outhttp<<argv[1];
-    outhttp<<"\ncp -r /opt/SendByLAN/.pages .";
-    outhttp<<"\n/opt/SendByLAN/main.py";
-    outhttp<<"\nrm -r .pages";
     outhttp.close();
-
     //让打开时界面显示在正中
     MainWindow w;
     w.show();

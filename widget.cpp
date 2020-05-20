@@ -63,7 +63,7 @@ void Widget::on_pushButton_clicked()
       clipboard->setText(ip_address);
 }
 
-QPixmap Widget::createQRCode(const QString &text) //UI创建函数
+QPixmap Widget::createQRCode(const QString &text) //二维码创建函数
 {
     int margin = 2;
     if (text.length() == 0)

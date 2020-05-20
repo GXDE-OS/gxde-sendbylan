@@ -1,5 +1,36 @@
 #!/usr/bin/env python
 # _*_ coding: utf-8 _*_
+
+"""
+modifyDate: 20120808 ~ 20120810
+原作者为：bones7456, http://li2z.cn/
+修改者为：decli@qq.com
+修改者为:SuperEndermanSM http://www.shenmo.tech:666/
+v1.3 全端口支持
+v1.2，changeLog：
++: 文件日期/时间/颜色显示、多线程支持、主页跳转
+-: 解决不同浏览器下上传文件名乱码问题：仅IE，其它浏览器暂时没处理。
+-: 一些路径显示的bug，主要是 cgi.escape() 转义问题
+?: notepad++ 下直接编译的server路径问题
+"""
+
+"""
+  简介：这是一个 python 写的轻量级的文件共享服务器（基于内置的SimpleHTTPServer模块），
+  支持文件上传下载，只要你安装了python（建议版本2.6~2.7，不支持3.x），
+  然后去到想要共享的目录下，执行：
+    python SimpleHTTPServerWithUpload.py 1234    
+  其中1234为你指定的端口号，如不写，默认为 8080
+  然后访问 http://localhost:1234 即可，localhost 或者 1234 请酌情替换。
+"""
+
+"""
+Simple HTTP Server With Upload.
+  
+This module builds on BaseHTTPServer by implementing the standard GET
+and HEAD requests in a fairly straightforward manner.
+  
+"""
+
 import platform
 import sys
 import urllib2
@@ -40,7 +71,20 @@ def get_ip_address(ifname):
 
 class GetWanIp:
     def getip(self):
-        myip = "127.0.0.1"
+        try:
+            myip = self.visit(
+                "http://ip.taobao.com/service/getIpInfo.php?ip=myip")
+        except:
+            print "ip.taobao.com is Error"
+            try:
+                myip = self.visit("http://www.bliao.com/ip.phtml")
+            except:
+                print "bliao.com is Error"
+                try:
+                    myip = self.visit("http://www.whereismyip.com/")
+                except:  # 'NoneType' object has no attribute 'group'
+                    print "whereismyip is Error"
+                    myip = "127.0.0.1"
         return myip
 
     def visit(self, url):
@@ -85,6 +129,18 @@ def showTips():
 
 
 serveraddr = showTips()
+shareDir = os.getcwd()
+#password = ''
+try:
+  shareDir = sys.argv[2]
+  print 'share dir is ' + shareDir
+except Exception, e:
+  print 'did not set share dir, use current dir '+shareDir
+#try:
+#  password = sys.argv[3]
+#  print 'password dir is ' + password
+#except Exception, e:
+#  print 'did not set password'
 
 
 def sizeof_fmt(num):
@@ -221,10 +277,15 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         """
         isApi = False
-        if self.path.find('/api')>-1:
+        path = ''
+        if self.path.startswith('/api'):
           isApi = True
           self.path = self.path.replace('/api','',1)
-        path = self.translate_path(self.path)
+          path = shareDir + self.path
+        elif self.path.startswith('/.pages'):
+          path = self.translate_path(self.path)
+        else:
+          path = shareDir+self.path
         f = None
         if isApi:
             return self.list_directory(path)
@@ -236,7 +297,7 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 self.end_headers()
                 return None
             for index in ".pages/index.html", ".pages/index.htm":
-                index = os.path.join(path, index)
+                index = self.translate_path(index)
                 if os.path.exists(index):
                     path = index
                     break
@@ -275,7 +336,7 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         list.sort(key=lambda a: a.lower())
         f = StringIO()
         displaypath = cgi.escape(urllib.unquote(self.path))
-        f.write('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
+        #f.write('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
         f.write('<html>\n<meta charset="UTF-8">\n<title>Directory listing for %s</title>\n' %
                 displaypath)
         f.write("<body>\n<h2>Directory listing for %s</h2>\n" % displaypath)
@@ -299,7 +360,7 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 colorName = '<span style="background-color: #FFBFFF;">' + name + '@</span>'
                 displayname = name
                 # Note: a link to a directory displays with @ and links with /
-            filename = os.getcwd() + '/' + displaypath + displayname
+            filename = path+displayname
             f.write('<table><tr><td width="60%%"><a href="%s">%s</a></td><td width="20%%">%s</td><td width="20%%">%s</td></tr>\n'
                     % (urllib.quote(linkname), colorName,
                        sizeof_fmt(os.path.getsize(filename)), modification_date(filename)))

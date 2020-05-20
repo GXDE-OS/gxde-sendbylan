@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <string>
+#include "config.h"
 namespace Ui {
 class Widget;
 }
