@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>icons/redeyes.svg</file>
+        <file>icons/image-red-eye.svg</file>
+    </qresource>
+</RCC>

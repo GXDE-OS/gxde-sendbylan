@@ -14,7 +14,7 @@ Widget::Widget(QWidget *parent) :
     ui->label->setText("正在加载");
 
     //加载ok图标
-    QString strPath = "/opt/SendByLAN/ok.svg";
+    QString strPath = "ok.svg";
     QSvgRenderer* svgRender = new QSvgRenderer();
     svgRender->load(strPath);
     QPixmap* pixmap = new QPixmap(130,130);

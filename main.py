@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # _*_ coding: utf-8 _*_
+# encoding =utf-8
 
 """
 modifyDate: 20120808 ~ 20120810
@@ -49,8 +50,10 @@ __version__ = "0.1"
 __all__ = ["SimpleHTTPRequestHandler"]
 __author__ = "bones7456"
 __home_page__ = ""
-
-
+favicon="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJhSURBVFhH7dZLiE5hHMfxl3EXmgbJJUTERGoWNhZkIYWxsKHYSCxQikxC2dizVZpBCoXcksvCYgpJFIlCUhYUcsn98v1OPfU473PGvGfedyblV5+aOXPOeZ45z/+5lP6nl1KHoeGHnkxfzEALZqIdPZI+mIa9eIZf2ICax4anYA8e4yds/A3momax4UnYiUcIDQd3MRI1yQRsxwP8QNxwcBjWQ1UzDltwD3kNB5tRtYzBJtzBd8QNfcGnzLV3mIduZxSs5FvINhwauo2P0TXdh50unAasxXV8Q/zy4CWOIEy52DH0Q8Wpxxq4eHxF9sXBc+zCjehabCsqygisxDU4pqmXBg+xGqeia7EPWIAuZRhW4Ao+I/XCmOO9EPuRnfeBHXS2dBo3ieW4iGwF5/HrzMY2dPaVTqI/khmCJTiLbOXm8T89A1c9h+ktUvcFO1CWQViM03CMUg+mOPUOYTTmw+JL3Rf4NRehLFNh4++RejDFz7wPw9EI1/bUfbEnmIiyuHH4Incn1/DLeIW8QvIr7cZgjMUlpO7LOoeB+GushTlwvXZ8XyCs7a+xERaSnW5FtqE8bskVxx57glkHd7BVcBcbAA8XqSU4xSFbim7F45vDZabDla4r64Nckj2YlKWSM6EvCnGjOY+rcIgcEheuvDG+iQPwi/2RoodSC9ZFx5qwuA7iAsKxy85YpOGLnYALW9XiSulOaGM22oQQi3gW1uM4PJItQ1XTjLAVH0XHGT8Rh2Y88v5eOHbAqfkUTtnCKXowdGw9E7jzeRQrnKId8DlnQFvHb72QybDQ/vWUSr8BOTAu01/y3KsAAAAASUVORK5CYII="
+folderIcon='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPGRlZnM+CiAgICA8ZmlsdGVyIGlkPSJmb2xkZXItMzItYSIgd2lkdGg9IjEyOC42JSIgaGVpZ2h0PSIxMzMuMyUiIHg9Ii0xNC4zJSIgeT0iLTE2LjclIiBmaWx0ZXJVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giPgogICAgICA8ZmVPZmZzZXQgZHk9IjEiIGluPSJTb3VyY2VBbHBoYSIgcmVzdWx0PSJzaGFkb3dPZmZzZXRPdXRlcjEiLz4KICAgICAgPGZlR2F1c3NpYW5CbHVyIGluPSJzaGFkb3dPZmZzZXRPdXRlcjEiIHJlc3VsdD0ic2hhZG93Qmx1ck91dGVyMSIgc3RkRGV2aWF0aW9uPSIuNSIvPgogICAgICA8ZmVDb21wb3NpdGUgaW49InNoYWRvd0JsdXJPdXRlcjEiIGluMj0iU291cmNlQWxwaGEiIG9wZXJhdG9yPSJvdXQiIHJlc3VsdD0ic2hhZG93Qmx1ck91dGVyMSIvPgogICAgICA8ZmVDb2xvck1hdHJpeCBpbj0ic2hhZG93Qmx1ck91dGVyMSIgcmVzdWx0PSJzaGFkb3dNYXRyaXhPdXRlcjEiIHZhbHVlcz0iMCAwIDAgMCAwICAgMCAwIDAgMCAwICAgMCAwIDAgMCAwICAwIDAgMCAwLjE1IDAiLz4KICAgICAgPGZlTWVyZ2U+CiAgICAgICAgPGZlTWVyZ2VOb2RlIGluPSJzaGFkb3dNYXRyaXhPdXRlcjEiLz4KICAgICAgICA8ZmVNZXJnZU5vZGUgaW49IlNvdXJjZUdyYXBoaWMiLz4KICAgICAgPC9mZU1lcmdlPgogICAgPC9maWx0ZXI+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZvbGRlci0zMi1jIiB4MT0iNTAlIiB4Mj0iNTAlIiB5MT0iMCUiIHkyPSIzNy45NjglIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwQjhGRiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyRTVERkYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8cGF0aCBpZD0iZm9sZGVyLTMyLWIiIGQ9Ik0xNS41LDEuNSBMMTUuNSwxLjUgQzE1Ljc5ODU5NTEsMi4zOTU3ODU0NCAxNi42MzY4OTgxLDMgMTcuNTgxMTM4OCwzIEwyNC41LDMgQzI2LjQzMjk5NjYsMyAyOCw0LjU2NzAwMzM4IDI4LDYuNSBMMjgsMjAuNSBDMjgsMjIuNDMyOTk2NiAyNi40MzI5OTY2LDI0IDI0LjUsMjQgTDMuNSwyNCBDMS41NjcwMDMzOCwyNCAtNC4yMzk1ODQwM2UtMTQsMjIuNDMyOTk2NiAtNC4yNjMyNTY0MWUtMTQsMjAuNSBMLTQuMjYzMjU2NDFlLTE0LDMuNSBDLTQuMjg2OTI4OGUtMTQsMS41NjcwMDMzOCAxLjU2NzAwMzM4LC0yLjgwNjY2MjM3ZS0xNCAzLjUsLTIuODQyMTcwOTRlLTE0IEwxMy40MTg4NjEyLC0yLjY2NDUzNTI2ZS0xNCBDMTQuMzYzMTAxOSwtMi43NjU3NDYxMWUtMTQgMTUuMjAxNDA0OSwwLjYwNDIxNDU2NCAxNS41LDEuNSBaIi8+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZvbGRlci0zMi1nIiB4MT0iNTAlIiB4Mj0iNTAlIiB5MT0iMCUiIHkyPSIxMS43OTYlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0ZGRiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNDRUY1RkYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8cmVjdCBpZD0iZm9sZGVyLTMyLWYiIHdpZHRoPSIyNiIgaGVpZ2h0PSIxMCIgeD0iMSIgeT0iNCIgcng9IjIuMjUiLz4KICAgIDxmaWx0ZXIgaWQ9ImZvbGRlci0zMi1lIiB3aWR0aD0iMTExLjUlIiBoZWlnaHQ9IjEzMCUiIHg9Ii01LjglIiB5PSItMTUlIiBmaWx0ZXJVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giPgogICAgICA8ZmVPZmZzZXQgaW49IlNvdXJjZUFscGhhIiByZXN1bHQ9InNoYWRvd09mZnNldE91dGVyMSIvPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgaW49InNoYWRvd09mZnNldE91dGVyMSIgcmVzdWx0PSJzaGFkb3dCbHVyT3V0ZXIxIiBzdGREZXZpYXRpb249Ii41Ii8+CiAgICAgIDxmZUNvbG9yTWF0cml4IGluPSJzaGFkb3dCbHVyT3V0ZXIxIiB2YWx1ZXM9IjAgMCAwIDAgMCAgIDAgMCAwIDAgMCAgIDAgMCAwIDAgMCAgMCAwIDAgMC4yIDAiLz4KICAgIDwvZmlsdGVyPgogICAgPGZpbHRlciBpZD0iZm9sZGVyLTMyLWgiIHdpZHRoPSIxMTEuNSUiIGhlaWdodD0iMTMwJSIgeD0iLTUuOCUiIHk9Ii0xNSUiIGZpbHRlclVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCI+CiAgICAgIDxmZU9mZnNldCBkeT0iMSIgaW49IlNvdXJjZUFscGhhIiByZXN1bHQ9InNoYWRvd09mZnNldElubmVyMSIvPgogICAgICA8ZmVDb21wb3NpdGUgaW49InNoYWRvd09mZnNldElubmVyMSIgaW4yPSJTb3VyY2VBbHBoYSIgazI9Ii0xIiBrMz0iMSIgb3BlcmF0b3I9ImFyaXRobWV0aWMiIHJlc3VsdD0ic2hhZG93SW5uZXJJbm5lcjEiLz4KICAgICAgPGZlQ29sb3JNYXRyaXggaW49InNoYWRvd0lubmVySW5uZXIxIiB2YWx1ZXM9IjAgMCAwIDAgMSAgIDAgMCAwIDAgMSAgIDAgMCAwIDAgMSAgMCAwIDAgMC41IDAiLz4KICAgIDwvZmlsdGVyPgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJmb2xkZXItMzItaSIgY3g9IjUwJSIgY3k9IjAlIiByPSIxMTcuNjEzJSIgZng9IjUwJSIgZnk9IjAlIiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KC4wNjE3MSAuOTk1MzggLS42Mzk4OSAuMDk2IC40NyAtLjQ5OCkiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNDhENUZGIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwODNGNiIvPgogICAgPC9yYWRpYWxHcmFkaWVudD4KICA8L2RlZnM+CiAgPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBmaWx0ZXI9InVybCgjZm9sZGVyLTMyLWEpIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyIDUpIj4KICAgIDxtYXNrIGlkPSJmb2xkZXItMzItZCIgZmlsbD0iI2ZmZiI+CiAgICAgIDx1c2UgeGxpbms6aHJlZj0iI2ZvbGRlci0zMi1iIi8+CiAgICA8L21hc2s+CiAgICA8dXNlIGZpbGw9InVybCgjZm9sZGVyLTMyLWMpIiB4bGluazpocmVmPSIjZm9sZGVyLTMyLWIiLz4KICAgIDxnIG1hc2s9InVybCgjZm9sZGVyLTMyLWQpIj4KICAgICAgPHVzZSBmaWxsPSIjMDAwIiBmaWx0ZXI9InVybCgjZm9sZGVyLTMyLWUpIiB4bGluazpocmVmPSIjZm9sZGVyLTMyLWYiLz4KICAgICAgPHVzZSBmaWxsPSJ1cmwoI2ZvbGRlci0zMi1nKSIgeGxpbms6aHJlZj0iI2ZvbGRlci0zMi1mIi8+CiAgICAgIDx1c2UgZmlsbD0iIzAwMCIgZmlsdGVyPSJ1cmwoI2ZvbGRlci0zMi1oKSIgeGxpbms6aHJlZj0iI2ZvbGRlci0zMi1mIi8+CiAgICA8L2c+CiAgICA8ZyBmaWxsPSJ1cmwoI2ZvbGRlci0zMi1pKSIgbWFzaz0idXJsKCNmb2xkZXItMzItZCkiPgogICAgICA8cGF0aCBkPSJNMCwwLjI1IEwyOCwwLjI1IEwyOCwxNC43NSBDMjgsMTYuNjgyOTk2NiAyNi40MzI5OTY2LDE4LjI1IDI0LjUsMTguMjUgTDMuNSwxOC4yNSBDMS41NjcwMDMzOCwxOC4yNSAyLjM2NzIzODEzZS0xNiwxNi42ODI5OTY2IDAsMTQuNzUgTDAsMC4yNSBaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDUuNzUpIi8+CiAgICA8L2c+CiAgPC9nPgo8L3N2Zz4K'
+fileIcon='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InRleHQtcGxhaW4tYyIgeDE9IjUwJSIgeDI9IjUwJSIgeTE9IjAlIiB5Mj0iOTguOTQ3JSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNGN0Y3RjciLz4KICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRjZGNkY2Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPHBhdGggaWQ9InRleHQtcGxhaW4tYiIgZD0iTTE1LDAgTDIyLDcgTDIyLDIyIEMyMiwyNC4yMDkxMzkgMjAuMjA5MTM5LDI2IDE4LDI2IEw0LDI2IEMxLjc5MDg2MSwyNiAyLjcwNTQxNWUtMTYsMjQuMjA5MTM5IDAsMjIgTDAsNCBDLTIuNzA1NDE1ZS0xNiwxLjc5MDg2MSAxLjc5MDg2MSw0LjA1ODEyMjUxZS0xNiA0LDAgTDE1LDAgWiIvPgogICAgPGZpbHRlciBpZD0idGV4dC1wbGFpbi1hIiB3aWR0aD0iMTM2LjQlIiBoZWlnaHQ9IjEzMC44JSIgeD0iLTE4LjIlIiB5PSItMTEuNSUiIGZpbHRlclVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCI+CiAgICAgIDxmZU1vcnBob2xvZ3kgaW49IlNvdXJjZUFscGhhIiBvcGVyYXRvcj0iZGlsYXRlIiByYWRpdXM9Ii41IiByZXN1bHQ9InNoYWRvd1NwcmVhZE91dGVyMSIvPgogICAgICA8ZmVPZmZzZXQgZHk9IjEiIGluPSJzaGFkb3dTcHJlYWRPdXRlcjEiIHJlc3VsdD0ic2hhZG93T2Zmc2V0T3V0ZXIxIi8+CiAgICAgIDxmZUdhdXNzaWFuQmx1ciBpbj0ic2hhZG93T2Zmc2V0T3V0ZXIxIiByZXN1bHQ9InNoYWRvd0JsdXJPdXRlcjEiIHN0ZERldmlhdGlvbj0iMSIvPgogICAgICA8ZmVDb21wb3NpdGUgaW49InNoYWRvd0JsdXJPdXRlcjEiIGluMj0iU291cmNlQWxwaGEiIG9wZXJhdG9yPSJvdXQiIHJlc3VsdD0ic2hhZG93Qmx1ck91dGVyMSIvPgogICAgICA8ZmVDb2xvck1hdHJpeCBpbj0ic2hhZG93Qmx1ck91dGVyMSIgdmFsdWVzPSIwIDAgMCAwIDAgICAwIDAgMCAwIDAgICAwIDAgMCAwIDAgIDAgMCAwIDAuMSAwIi8+CiAgICA8L2ZpbHRlcj4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0idGV4dC1wbGFpbi1mIiB4MT0iNTAlIiB4Mj0iMTAuNDg5JSIgeTE9IjUwJSIgeTI9IjkxLjE5NCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjRkZGIiBzdG9wLW9wYWNpdHk9Ii4xIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI0ZGRiIgc3RvcC1vcGFjaXR5PSIuMyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxwYXRoIGlkPSJ0ZXh0LXBsYWluLWUiIGQ9Ik0xNSwwIEwyMiw3IEwxNy4yNSw3IEMxNi4wMDczNTkzLDcgMTUsNS45OTI2NDA2OSAxNSw0Ljc1IEwxNSwwIFoiLz4KICAgIDxmaWx0ZXIgaWQ9InRleHQtcGxhaW4tZCIgd2lkdGg9IjE1Ny4xJSIgaGVpZ2h0PSIxNTcuMSUiIHg9Ii0yOC42JSIgeT0iLTE0LjMlIiBmaWx0ZXJVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giPgogICAgICA8ZmVPZmZzZXQgZHk9IjEiIGluPSJTb3VyY2VBbHBoYSIgcmVzdWx0PSJzaGFkb3dPZmZzZXRPdXRlcjEiLz4KICAgICAgPGZlR2F1c3NpYW5CbHVyIGluPSJzaGFkb3dPZmZzZXRPdXRlcjEiIHJlc3VsdD0ic2hhZG93Qmx1ck91dGVyMSIgc3RkRGV2aWF0aW9uPSIuNSIvPgogICAgICA8ZmVDb21wb3NpdGUgaW49InNoYWRvd0JsdXJPdXRlcjEiIGluMj0iU291cmNlQWxwaGEiIG9wZXJhdG9yPSJvdXQiIHJlc3VsdD0ic2hhZG93Qmx1ck91dGVyMSIvPgogICAgICA8ZmVDb2xvck1hdHJpeCBpbj0ic2hhZG93Qmx1ck91dGVyMSIgdmFsdWVzPSIwIDAgMCAwIDAgICAwIDAgMCAwIDAgICAwIDAgMCAwIDAgIDAgMCAwIDAuMDUgMCIvPgogICAgPC9maWx0ZXI+CiAgPC9kZWZzPgogIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1IDMpIj4KICAgICAgPHVzZSBmaWxsPSIjMDAwIiBmaWx0ZXI9InVybCgjdGV4dC1wbGFpbi1hKSIgeGxpbms6aHJlZj0iI3RleHQtcGxhaW4tYiIvPgogICAgICA8cGF0aCBmaWxsPSJ1cmwoI3RleHQtcGxhaW4tYykiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLW9wYWNpdHk9Ii4xIiBzdHJva2Utd2lkdGg9Ii41IiBkPSJNMTUuMTc2Nzc2NywtMC4xNzY3NzY2OTUgTDIyLjE3Njc3NjcsNi44MjMyMjMzIEwyMi4yNSw3IEwyMi4yNSwyMiBDMjIuMjUsMjQuMzQ3MjEwMiAyMC4zNDcyMTAyLDI2LjI1IDE4LDI2LjI1IEw0LDI2LjI1IEMxLjY1Mjc4OTgxLDI2LjI1IC0wLjI1LDI0LjM0NzIxMDIgLTAuMjUsMjIgTC0wLjI1LDQgQy0wLjI1LDEuNjUyNzg5ODEgMS42NTI3ODk4MSwtMC4yNSA0LC0wLjI1IEwxNSwtMC4yNSBMMTUuMTc2Nzc2NywtMC4xNzY3NzY2OTUgWiIvPgogICAgICA8dXNlIGZpbGw9IiMwMDAiIGZpbHRlcj0idXJsKCN0ZXh0LXBsYWluLWQpIiB4bGluazpocmVmPSIjdGV4dC1wbGFpbi1lIi8+CiAgICAgIDx1c2UgZmlsbD0idXJsKCN0ZXh0LXBsYWluLWYpIiB4bGluazpocmVmPSIjdGV4dC1wbGFpbi1lIi8+CiAgICA8L2c+CiAgICA8cGF0aCBmaWxsPSIjQUNBM0MyIiBkPSJNMjQsMTIgTDI0LDEzIEw4LDEzIEw4LDEyIEwyNCwxMiBaIE0yNCwxNSBMMjQsMTYgTDgsMTYgTDgsMTUgTDI0LDE1IFogTTI0LDE4IEwyNCwxOSBMOCwxOSBMOCwxOCBMMjQsMTggWiBNMjQsMjEgTDI0LDIyIEw4LDIyIEw4LDIxIEwyNCwyMSBaIE0yNCwyNCBMMjQsMjUgTDgsMjUgTDgsMjQgTDI0LDI0IFoiLz4KICA8L2c+Cjwvc3ZnPgo='
+fileLink='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzJwdCIgaGVpZ2h0PSIzMnB0IiB2aWV3Qm94PSIwIDAgMzIgMzIiIHZlcnNpb249IjEuMSI+CjxnIGlkPSJzdXJmYWNlMSI+CjxwYXRoIHN0eWxlPSIgc3Ryb2tlOm5vbmU7ZmlsbC1ydWxlOm5vbnplcm87ZmlsbDpyZ2IoOTYuNDcwNTg4JSw5Ni40NzA1ODglLDk2LjQ3MDU4OCUpO2ZpbGwtb3BhY2l0eToxOyIgZD0iTSAxOC42Njc5NjkgMi42Njc5NjkgTCA4IDIuNjY3OTY5IEMgNi41MTk1MzEgMi42Njc5NjkgNS4zMzIwMzEgMy44NTE1NjIgNS4zMzIwMzEgNS4zMzIwMzEgTCA1LjMzMjAzMSAyNi42Njc5NjkgQyA1LjMzMjAzMSAyOC4xNDg0MzggNi41MTk1MzEgMjkuMzMyMDMxIDggMjkuMzMyMDMxIEwgMjQgMjkuMzMyMDMxIEMgMjUuNDgwNDY5IDI5LjMzMjAzMSAyNi42Njc5NjkgMjguMTQ4NDM4IDI2LjY2Nzk2OSAyNi42Njc5NjkgTCAyNi42Njc5NjkgMTAuNjY3OTY5IEwgMTguNjY3OTY5IDIuNjY3OTY5IE0gMTQuNjY3OTY5IDI2LjY2Nzk2OSBMIDEzLjMzMjAzMSAyNi42Njc5NjkgQyAxMS4xODc1IDI2LjY2Nzk2OSA4IDI1LjI1MzkwNiA4IDIxLjMzMjAzMSBDIDggMTcuNDI1NzgxIDExLjE4NzUgMTYgMTMuMzMyMDMxIDE2IEwgMTQuNjY3OTY5IDE2IEwgMTQuNjY3OTY5IDE4LjY2Nzk2OSBMIDEzLjMzMjAzMSAxOC42Njc5NjkgQyAxMi43MTg3NSAxOC42Njc5NjkgMTAuNjY3OTY5IDE4Ljg5NDUzMSAxMC42Njc5NjkgMjEuMzMyMDMxIEMgMTAuNjY3OTY5IDIzLjg2NzE4OCAxMi44OTQ1MzEgMjQgMTMuMzMyMDMxIDI0IEwgMTQuNjY3OTY5IDI0IEwgMTQuNjY3OTY5IDI2LjY2Nzk2OSBNIDIwIDIwIEwgMjAgMjIuNjY3OTY5IEwgMTIgMjIuNjY3OTY5IEwgMTIgMjAgTCAyMCAyMCBNIDE4LjY2Nzk2OSAyNi42Njc5NjkgTCAxNy4zMzIwMzEgMjYuNjY3OTY5IEwgMTcuMzMyMDMxIDI0IEwgMTguNjY3OTY5IDI0IEMgMTkuMjgxMjUgMjQgMjEuMzMyMDMxIDIzLjc3MzQzOCAyMS4zMzIwMzEgMjEuMzMyMDMxIEMgMjEuMzMyMDMxIDE4LjgwMDc4MSAxOS4xMDU0NjkgMTguNjY3OTY5IDE4LjY2Nzk2OSAxOC42Njc5NjkgTCAxNy4zMzIwMzEgMTguNjY3OTY5IEwgMTcuMzMyMDMxIDE2IEwgMTguNjY3OTY5IDE2IEMgMjAuODEyNSAxNiAyNCAxNy40MjU3ODEgMjQgMjEuMzMyMDMxIEMgMjQgMjUuMjUzOTA2IDIwLjgxMjUgMjYuNjY3OTY5IDE4LjY2Nzk2OSAyNi42Njc5NjkgTSAxNy4zMzIwMzEgMTIgTCAxNy4zMzIwMzEgNC42Njc5NjkgTCAyNC42Njc5NjkgMTIgWiBNIDE3LjMzMjAzMSAxMiAiLz4KPC9nPgo8L3N2Zz4K'
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -71,21 +74,7 @@ def get_ip_address(ifname):
 
 class GetWanIp:
     def getip(self):
-        try:
-            myip = self.visit(
-                "http://ip.taobao.com/service/getIpInfo.php?ip=myip")
-        except:
-            print "ip.taobao.com is Error"
-            try:
-                myip = self.visit("http://www.bliao.com/ip.phtml")
-            except:
-                print "bliao.com is Error"
-                try:
-                    myip = self.visit("http://www.whereismyip.com/")
-                except:  # 'NoneType' object has no attribute 'group'
-                    print "whereismyip is Error"
-                    myip = "127.0.0.1"
-        return myip
+        return "127.0.0.1"
 
     def visit(self, url):
         #req = urllib2.Request(url)
@@ -130,18 +119,11 @@ def showTips():
 
 serveraddr = showTips()
 shareDir = os.getcwd()
-#password = ''
 try:
   shareDir = sys.argv[2]
   print 'share dir is ' + shareDir
 except Exception, e:
   print 'did not set share dir, use current dir '+shareDir
-#try:
-#  password = sys.argv[3]
-#  print 'password dir is ' + password
-#except Exception, e:
-#  print 'did not set password'
-
 
 def sizeof_fmt(num):
     for x in ['bytes', 'KB', 'MB', 'GB']:
@@ -201,9 +183,9 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             f.write("<strong>Failed:</strong>")
         f.write(info)
-        f.write("<br><a href=\"%s\">back</a>" % self.headers['referer'])
+        f.write("<br><a href='%s'>back</a>" % self.headers['referer'])
         f.write("<hr><small>Powered By: bones7456, check new version at ")
-        f.write("<a href=\"http://li2z.cn/?s=SimpleHTTPServerWithUpload\">")
+        f.write("<a href='http://li2z.cn/?s=SimpleHTTPServerWithUpload'>")
         f.write("here</a>.</small></body>\n</html>\n")
         length = f.tell()
         f.seek(0)
@@ -228,7 +210,7 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             r'Content-Disposition.*name="file"; filename="(.*)"', line)
         if not fn:
             return (False, "Can't find out file name...")
-        path = self.translate_path(self.path)
+        path = shareDir+self.path
         osType = platform.system()
         try:
             if osType == "Linux":
@@ -276,28 +258,17 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         None, in which case the caller has nothing further to do.
 
         """
-        isApi = False
-        path = ''
-        if self.path.startswith('/api'):
-          isApi = True
-          self.path = self.path.replace('/api','',1)
-          path = shareDir + self.path
-        elif self.path.startswith('/.pages'):
-          path = self.translate_path(self.path)
-        else:
-          path = shareDir+self.path
+        path = shareDir+urllib.unquote(self.path)
         f = None
-        if isApi:
-            return self.list_directory(path)
-        elif os.path.isdir(path):
+        if os.path.isdir(path):
             if not self.path.endswith('/'):
                 # redirect browser - doing basically what apache does
                 self.send_response(301)
                 self.send_header("Location", self.path + "/")
                 self.end_headers()
                 return None
-            for index in ".pages/index.html", ".pages/index.htm":
-                index = self.translate_path(index)
+            for index in "index.html", "index.htm":
+                index = os.path.join(path, index)
                 if os.path.exists(index):
                     path = index
                     break
@@ -336,35 +307,92 @@ class SimpleHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         list.sort(key=lambda a: a.lower())
         f = StringIO()
         displaypath = cgi.escape(urllib.unquote(self.path))
-        #f.write('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
-        f.write('<html>\n<meta charset="UTF-8">\n<title>Directory listing for %s</title>\n' %
-                displaypath)
-        f.write("<body>\n<h2>Directory listing for %s</h2>\n" % displaypath)
-        f.write("<hr>\n")
-        f.write("<form ENCTYPE=\"multipart/form-data\" method=\"post\">")
-        f.write("<input name=\"file\" type=\"file\"/>")
-        f.write("<input type=\"submit\" value=\"upload\"/>")
-        f.write("              ")
-        f.write("<input type=\"button\" value=\"HomePage\" onClick=\"location='/'\">")
-        f.write("</form>\n")
-        f.write("<hr>\n<ul>\n")
+        parimaryColor = "rgb(9, 2, 75)"
+        secondColor="rgb(58, 48, 151)"
+        infoColor="rgba(192, 191, 191, 1)"
+        reversParimaryColor="rgb(247, 247, 248)"
+        f.write('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
+        f.write('<html><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Directory listing for %s</title>' %displaypath)
+        f.write('<meta charset="utf-8">')
+        f.write('<meta http-equiv="X-UA-Compatible" content="IE=edge">')
+        f.write('<meta name="viewport" content="width=device-width,initial-scale=1.0">')
+        f.write("<link rel='icon' href='"+favicon+"'>")
+        f.write("<head>")
+        f.write("<style>")
+        f.write("body,html{padding:0px;margin:0px;}")
+        f.write("input[type='submit'],button,input[type=button]{background-color: #fff;border:none;box-shadow: 0px 0px 3px %s;cursor:pointer;padding:3px 5px;}" %infoColor)
+        f.write(".main-container{position:relative;padding:3px 5px;}")
+        f.write("@media screen and (min-width:768px){")
+        f.write(".main-container{margin-left:15%%;margin-right:15%%;box-shadow:0px 0px 10px %s;}"%infoColor)
+        f.write("}")
+        f.write("@media screen and (min-width:1200px){.main-container {margin-left:20%%;margin-right:20%%;box-shadow:0px 0px 10px %s ;}}"%infoColor)
+        f.write("@media screen and (min-width:1920px) {.main-container {margin-left:30%%;margin-right:30%%;box-shadow:0px 0px 10px %s ;}}"%infoColor)
+        f.write(".navigator{background-color:%s;line-height: 3rem;height:3rem;padding:3px 5px;color:%s;}"%(parimaryColor,reversParimaryColor))
+        f.write(".text-info{font-size:12px;color:%s;}"%infoColor)
+        f.write("table tr:hover{background-color:rgba(192,191,191,0.5);}")
+        f.write("table{width:100%;border-collapse:collapse}")
+        f.write("table tr td{padding:3px 5px;}")
+        f.write("table tr td div img{width:100%;height:100%;}")
+        f.write("table tr td:first-child div{float:left;}")
+        f.write("table tr td:first-child a{padding:3px 5px;text-decoration:none;color:%s;float:left;}"%secondColor)
+        f.write("table tr td:first-child a:hover {color: %s;}"%parimaryColor)
+        f.write(".file-icon{display:inline-block;width:2rem;height:2rem;border-radius:4px;font-size:9px;text-align:center;}")
+        f.write("a{color:%s;text-decoration:none;}a:hover{color:%s;}"%(parimaryColor,infoColor))
+        f.write("<style>")
+        f.write("<style>")
+        f.write("</style>")
+        f.write("</head>")
+        f.write("<body>")
+        f.write("<div class='navigator'>文件共享</div>")
+        f.write("<div class='main-container'>")
+        def isEmpty(i):
+          return i!=''
+        pathArr = filter(isEmpty,displaypath.split('/'))
+        f.write("<h4>/")
+        recordPath = ''
+        for item in pathArr:
+          recordPath +='/'+item
+          f.write("<a href='"+recordPath+"/'>%s</a>/"%item)
+        f.write("</h4>")
+        f.write("<div>")
+        f.write("<form ENCTYPE='multipart/form-data' method='post'>")
+        f.write("<input name='file' type='file' id='selectedFile'/>")
+        f.write("<input type='submit' value='上传' onClick='uploadCheck(event)'/>")
+        f.write("<script>")
+        f.write("function uploadCheck(event){")
+        f.write("var length = document.getElementById('selectedFile').files.length;")
+        f.write("if(length===0){event.preventDefault();alert('请选择文件');}")
+        f.write("}")
+        f.write("</script>")
+        f.write("<input type='button' value='根目录' onClick='location=\"/\"'>")
+        f.write("</form>")
+        f.write("</div>")
+        f.write("<div style='min-height:calc(100vh - 165px);'>")
+        f.write("<table>")
+        if len(list)==0:
+          f.write("<tr><td width='100%' style='text-align:center;' class='text-info'>无数据</td></tr>")
         for name in list:
             fullname = os.path.join(path, name)
             colorName = displayname = linkname = name
             # Append / for directories or @ for symbolic links
             if os.path.isdir(fullname):
-                colorName = '<span style="background-color: #CEFFCE;">' + name + '/</span>'
-                displayname = name
                 linkname = name + "/"
-            if os.path.islink(fullname):
-                colorName = '<span style="background-color: #FFBFFF;">' + name + '@</span>'
+                colorName = '<div class="file-icon"><img src="'+folderIcon+'"></div><a href="'+urllib.quote(linkname)+'" title="'+name+'">' + name + '/</a>'
+                displayname = name
+            elif os.path.islink(fullname):
+                colorName = '<div class="file-icon"><img src="'+fileLink+'"></div><a href="'+urllib.quote(linkname)+'" title="'+name+'">' + name + '</a>'
                 displayname = name
                 # Note: a link to a directory displays with @ and links with /
-            filename = path+displayname
-            f.write('<table><tr><td width="60%%"><a href="%s">%s</a></td><td width="20%%">%s</td><td width="20%%">%s</td></tr>\n'
-                    % (urllib.quote(linkname), colorName,
-                       sizeof_fmt(os.path.getsize(filename)), modification_date(filename)))
-        f.write("</table>\n<hr>\n</body>\n</html>\n")
+            else:
+                colorName = '<div class="file-icon"><img src="'+fileIcon+'"></div><a href="'+urllib.quote(linkname)+'" download="'+name+'" title="'+name+'">' + name + '</a>'
+            filename = path + displayname
+            f.write('<tr><td>%s</td><td class="text-info">%s</td><td class="text-info">%s</td></tr>'
+                    % (colorName,sizeof_fmt(os.path.getsize(filename)), modification_date(filename)))
+        f.write("</table>")
+        f.write("</div>")
+        f.write("</div>")
+        f.write("</body>")
+        f.write("</html>")
         length = f.tell()
         f.seek(0)
         self.send_response(200)
