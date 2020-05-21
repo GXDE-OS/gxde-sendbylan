@@ -16,6 +16,7 @@ public:
 
 private:
     Widget *w;
+    DMenu *m_menu;
 };
 
 #endif // MAINWINDOW_H

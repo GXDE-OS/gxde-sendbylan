@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <string>
 #include "config.h"
+#include <DMenu>
+DWIDGET_USE_NAMESPACE
 namespace Ui {
 class Widget;
 }
@@ -26,5 +28,6 @@ private slots:
 
 private:
     Ui::Widget *ui;
+
 };
 #endif // WIDGET_H

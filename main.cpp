@@ -22,17 +22,28 @@ int main(int argc, char *argv[])
     a.setProductIcon(QIcon(PATH_ICON));  //设置Logo
     a.setProductName(MAIN_TITLE);
     a.setApplicationName(MAIN_TITLE); //只有在这儿修改窗口标题才有效
+
+    std::string config_path=getenv("HOME");//读入配置目录
+    config_path+="/.config/SBL/";
     //模拟文件锁
     std::fstream lock;
     lock.open("/tmp/http.sh",std::ios::in);
     if(lock){
-        if(DMessageBox::critical(NULL, "无法打开", "我们无法同时分享多个文件夹！\n如果您确信现在并没有运行其他分享，您可以点击NO忽略该警告", DMessageBox::Yes|DMessageBox::No, DMessageBox::Yes)==DMessageBox::No){
+        if(DMessageBox::critical(NULL, "无法打开", "我们无法同时分享多个文件夹！\n如果您确信现在并没有运行其他分享，您可以点击NO忽略该警告", DMessageBox::Ok|DMessageBox::Close, DMessageBox::Ok)==DMessageBox::No){
             system("rm /tmp/http.sh");
         }else {
             return 0;
         }
     }
-
+    //读入端口号
+    std::fstream readconfig_port;
+    std::string port;
+    readconfig_port.open(config_path+"port",std::ios::in);
+    if(readconfig_port){
+        getline(readconfig_port,port);
+    }else {
+        port="8080";
+    }
     //检查网络状态
     QString ip_address;
     QStringList temp;
@@ -40,7 +51,7 @@ int main(int argc, char *argv[])
     QList<QHostAddress> network;
     network = QNetworkInterface().allAddresses();
     for (int i=0;i<network.size();i++) {
-        ip_address="http://"+QNetworkInterface().allAddresses().at(i).toString()+":8080";
+        ip_address="http://"+QNetworkInterface().allAddresses().at(i).toString()+":"+port.c_str();
         temp=ip_address.split(".");
         if(temp[0]=="http://192"){
             isonlion=true;
@@ -52,12 +63,15 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+
     //写入运行脚本
     std::fstream outhttp;
     outhttp.open("/tmp/http.sh",std::fstream::out);
     outhttp<<"cd /opt/SendByLAN\n";
     qDebug()<<sizeof (&argv)/sizeof (argv[1]);
-    outhttp<<"/opt/SendByLAN/main.py 8080 ";
+    outhttp<<"/opt/SendByLAN/main.py ";
+    outhttp<<port;
+    outhttp<<" ";
     outhttp<<argv[1];
     outhttp.close();
     //让打开时界面显示在正中

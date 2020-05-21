@@ -6,12 +6,22 @@
 #include <QtSvg>
 #include <QString>
 #include "QRCode/qrencode.h"
+#include <DMenu>
+#include <DMenuBar>
+DWIDGET_USE_NAMESPACE
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
     ui->label->setText("正在加载");
+//    QAction setting;
+//    setting.setText("设置");
+//    ui->
+//    QMenu * setting_menu;
+//    setting_menu=DMenuBar(this).addAction(&setting);
+//    addAction(&setting);
+//    setting_menu=DMenuBar().addAction(QString::fromLocal8Bit("设置"));
 
     //加载ok图标
     QString strPath = "ok.svg";
@@ -28,17 +38,28 @@ Widget::Widget(QWidget *parent) :
 
     //显示
     ui->label->setPixmap(*pixmap);
-
     ui->label->setAlignment(Qt::AlignHCenter);
     ui->label->show();
     ui->label_2->setText("在接受端浏览器中输入：");
     QList<QHostAddress> network;
     network = QNetworkInterface().allAddresses();
     QStringList temp;
+    //读入配置文件目录
+    std::string config_path=getenv("HOME");//读入配置目录
+    config_path+="/.config/SBL/";
 
+    //再次读入端口号
+    std::fstream readconfig_port;
+    std::string port;
+    readconfig_port.open(config_path+"port",std::ios::in);
+    if(readconfig_port){
+        getline(readconfig_port,port);
+    }else {
+        port="8080";
+    }
     //读取显示本地局域网IP
     for (int i=0;i<network.size();i++) {
-        ip_address="http://"+QNetworkInterface().allAddresses().at(i).toString()+":8080";
+        ip_address="http://"+QNetworkInterface().allAddresses().at(i).toString()+":"+port.c_str();
         temp=ip_address.split(".");
         if(temp[0]=="http://192"){
             break;
