@@ -1,20 +1,20 @@
 #include "mainwindow.h"
 #include <DMainWindow>
-#include <DMenu>
-#include <DMenuBar>
+#include <QMenu>
+#include <QMenuBar>
 #include <DTitlebar>
 #include <QDebug>
 DWIDGET_USE_NAMESPACE
 
 MainWindow::MainWindow(QWidget *parent)
     : DMainWindow(parent),
-      m_menu(new DMenu)
+      m_menu(new QMenu)
 {
     w = new Widget;
     setCentralWidget(w);
 
-    setMinimumSize(400,350);
-    setMaximumSize(400,350);
+    setMinimumSize(450,350);
+    setMaximumSize(450,350);
     setWindowFlags(Qt::WindowStaysOnTopHint);
 //    QMenu *fileMenu;
 //    QString file="文件";

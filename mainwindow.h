@@ -15,8 +15,8 @@ public:
     ~MainWindow();
 
 private:
-    Widget *w;
-    DMenu *m_menu;
+    QWidget *w;
+    QMenu *m_menu;
 };
 
 #endif // MAINWINDOW_H

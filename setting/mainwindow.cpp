@@ -9,8 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
     w = new Widget;
     setCentralWidget(w);
 
-    setMinimumSize(400,450);
-    setMaximumSize(400,450);
+    setMinimumSize(450,450);
+    setMaximumSize(450,450);
     setWindowFlags(Qt::WindowStaysOnTopHint);
 }
 

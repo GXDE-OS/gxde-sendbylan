@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <widget.h>
 #include <fstream>
-#include <DMessageBox>
+#include <QMessageBox>
 #include <QNetworkInterface>
 #include <QList>
 DWIDGET_USE_NAMESPACE
@@ -16,9 +16,9 @@ int main(int argc, char *argv[])
     DApplication a(argc, argv);
     a.setAttribute(Qt::AA_UseHighDpiPixmaps);
     a.loadTranslator();
-    a.setOrganizationName("free");
+    a.setOrganizationName("GXDE OS");
     a.setApplicationVersion(DApplication::buildVersion(VERSON));
-    a.setApplicationAcknowledgementPage("QQ:2684053139");
+    a.setApplicationAcknowledgementPage("https://gitee.com/shenmo7192");
     a.setProductIcon(QIcon(PATH_ICON));  //设置Logo
     a.setProductName(MAIN_TITLE);
     a.setApplicationName(MAIN_TITLE); //只有在这儿修改窗口标题才有效
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     std::fstream lock;
     lock.open("/tmp/http.sh",std::ios::in);
     if(lock){
-        if(DMessageBox::critical(NULL, "无法打开", "我们无法同时分享多个文件夹！\n如果您确信现在并没有运行其他分享，您可以点击NO忽略该警告", DMessageBox::Ok|DMessageBox::Close, DMessageBox::Ok)==DMessageBox::No){
+        if(QMessageBox::critical(NULL, "无法打开", "我们无法同时分享多个文件夹！\n如果您确信现在并没有运行其他分享，您可以点击NO忽略该警告", QMessageBox::Ok|QMessageBox::Close, QMessageBox::Ok)==QMessageBox::No){
             system("rm /tmp/http.sh");
         }else {
             return 0;
@@ -53,10 +53,10 @@ int main(int argc, char *argv[])
     for (int i=0;i<network.size();i++) {
         ip_address="http://"+QNetworkInterface().allAddresses().at(i).toString()+":"+port.c_str();
         temp=ip_address.split(".");
-        if(temp[0]=="http://192"){
+ //       if(temp[0]=="http://192"){
             isonlion=true;
-            break;
-        }
+//            break;
+//        }
     }
     if(!isonlion){
         system("notify-send \"您可能没有接入局域网，请检查网络情况。\" --icon=3");

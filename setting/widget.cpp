@@ -6,6 +6,7 @@
 #include <QString>
 #include <dswitchbutton.h>
 #include <stdio.h>
+
 DWIDGET_USE_NAMESPACE
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -17,9 +18,9 @@ Widget::Widget(QWidget *parent) :
     ui->label_5->hide();
     ui->label_4->setStyleSheet("color:red");
     ui->widget_1->layout()->addWidget(switch_btn);
-    connect(switch_btn,&DSwitchButton::clicked,[=](){
+    connect(switch_btn,&DSwitchButton::checked,[=](){
         ui->label_5->hide();
-        if(!switch_btn->isChecked()){
+        if(!switch_btn->checked()){
             ui->lineEdit->hide();
             ui->toolButton->hide();
         }else {
@@ -44,7 +45,7 @@ Widget::Widget(QWidget *parent) :
         qDebug()<<"不存在";
         switch_btn->setChecked(false);
     }
-    if(!switch_btn->isChecked()){
+    if(!switch_btn->checked()){
         ui->lineEdit->hide();
         ui->toolButton->hide();
     }else {
@@ -96,7 +97,7 @@ void Widget::on_pushButton_clicked() //写入配置
 
 
 
-    if(ui->lineEdit->text()== "" && switch_btn->isChecked()){
+    if(ui->lineEdit->text()== "" && switch_btn->checked()){
         system("notify-send \"请填写密码。\" --icon=preferences-system");
         ui->label_5->show();
         return;
@@ -107,7 +108,7 @@ void Widget::on_pushButton_clicked() //写入配置
         return;
     }
     //密码模块
-    if (switch_btn->isChecked()) {
+    if (switch_btn->checked()) {
         std::fstream passwd;
         passwd.open(config_path+"passwd",std::ios::out);
         passwd<<ui->lineEdit->text().toStdString();

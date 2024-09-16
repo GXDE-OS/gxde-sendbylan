@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <widget.h>
 #include <fstream>
-#include <DMessageBox>
+#include <QMessageBox>
 DWIDGET_USE_NAMESPACE
 int main(int argc, char *argv[])
 {
@@ -12,12 +12,12 @@ int main(int argc, char *argv[])
     DApplication a(argc, argv);
     a.setAttribute(Qt::AA_UseHighDpiPixmaps);
     a.loadTranslator();
-    a.setOrganizationName("free");
+    a.setOrganizationName("GXDE OS");
     a.setApplicationVersion(DApplication::buildVersion("2.0"));
-    a.setApplicationAcknowledgementPage("QQ:2684053139");
-    a.setProductIcon(QIcon("/opt/SendByLAN/folder.svg"));  //设置Logo
-    a.setProductName("文件夹共享设置");
-    a.setApplicationName("文件夹共享设置"); //只有在这儿修改窗口标题才有效
+    a.setApplicationAcknowledgementPage("https://gitee.com/shenmo7192");
+    a.setProductIcon(QIcon("/opt/SendByLAN/sendbylan.svg"));  //设置Logo
+    a.setProductName("共享设置");
+    a.setApplicationName("共享设置"); //只有在这儿修改窗口标题才有效
     MainWindow w;
 
     w.show();

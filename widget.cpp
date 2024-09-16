@@ -6,8 +6,8 @@
 #include <QtSvg>
 #include <QString>
 #include "QRCode/qrencode.h"
-#include <DMenu>
-#include <DMenuBar>
+#include <QMenu>
+// #include <QMenuBar>
 DWIDGET_USE_NAMESPACE
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -19,9 +19,9 @@ Widget::Widget(QWidget *parent) :
 //    setting.setText("设置");
 //    ui->
 //    QMenu * setting_menu;
-//    setting_menu=DMenuBar(this).addAction(&setting);
+//    setting_menu=QMenuBar(this).addAction(&setting);
 //    addAction(&setting);
-//    setting_menu=DMenuBar().addAction(QString::fromLocal8Bit("设置"));
+//    setting_menu=QMenuBar().addAction(QString::fromLocal8Bit("设置"));
 
     //加载ok图标
     QString strPath = "ok.svg";

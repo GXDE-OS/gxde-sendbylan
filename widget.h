@@ -4,7 +4,8 @@
 #include <QWidget>
 #include <string>
 #include "config.h"
-#include <DMenu>
+#include <QMenu>
+#include <DMainWindow>
 DWIDGET_USE_NAMESPACE
 namespace Ui {
 class Widget;
