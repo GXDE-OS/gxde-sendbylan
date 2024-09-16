@@ -19,13 +19,13 @@ MainWindow::MainWindow(QWidget *parent)
 //    QMenu *fileMenu;
 //    QString file="文件";
 //    fileMenu = menuBar()->addAction(file);
-    QAction *setting(new QAction(tr("设置"), this));
-    m_menu->addAction(setting);
-    titlebar()->setMenu(m_menu);
-    connect(setting,&QAction::triggered,this,[=](){
-       qDebug()<<"设置";
-       system("/opt/gxde-sendbylan/setting");
-    });
+//    QAction *setting(new QAction(tr("设置"), this));
+//    m_menu->addAction(setting);
+//    titlebar()->setMenu(m_menu);
+//    connect(setting,&QAction::triggered,this,[=](){
+//       qDebug()<<"设置";
+//       system("/opt/gxde-sendbylan/setting");
+//    });
 }
 MainWindow::~MainWindow()
 {
