@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     titlebar()->setMenu(m_menu);
     connect(setting,&QAction::triggered,this,[=](){
        qDebug()<<"设置";
-       system("/opt/SendByLAN/setting");
+       system("/opt/gxde-sendbylan/setting");
     });
 }
 MainWindow::~MainWindow()

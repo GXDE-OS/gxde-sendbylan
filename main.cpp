@@ -67,9 +67,9 @@ int main(int argc, char *argv[])
     //写入运行脚本
     std::fstream outhttp;
     outhttp.open("/tmp/http.sh",std::fstream::out);
-    outhttp<<"cd /opt/SendByLAN\n";
+    outhttp<<"cd /opt/gxde-sendbylan\n";
     qDebug()<<sizeof (&argv)/sizeof (argv[1]);
-    outhttp<<"/opt/SendByLAN/main.py ";
+    outhttp<<"/opt/gxde-sendbylan/main.py ";
     outhttp<<port;
     outhttp<<" ";
     outhttp<<argv[1];

@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     a.setOrganizationName("GXDE OS");
     a.setApplicationVersion(DApplication::buildVersion("2.0"));
     a.setApplicationAcknowledgementPage("https://gitee.com/shenmo7192");
-    a.setProductIcon(QIcon("/opt/SendByLAN/sendbylan.svg"));  //设置Logo
+    a.setProductIcon(QIcon("/opt/gxde-sendbylan/sendbylan.svg"));  //设置Logo
     a.setProductName("共享设置");
     a.setApplicationName("共享设置"); //只有在这儿修改窗口标题才有效
     MainWindow w;
