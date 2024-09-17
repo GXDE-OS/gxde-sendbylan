@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     qDebug()<<sizeof (&argv)/sizeof (argv[1]);
     outhttp<<"/opt/gxde-sendbylan/main.py ";
     outhttp<<port;
-    outhttp<<" ";
+    outhttp<<" -d";
     outhttp<<argv[1];
     outhttp.close();
     //让打开时界面显示在正中
