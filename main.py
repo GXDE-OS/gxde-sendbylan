@@ -14,6 +14,7 @@ import threading
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 from io import BytesIO
+import argparse
 
 __version__ = "0.1"
 
@@ -21,20 +22,9 @@ class GetWanIp:
     def getip(self):
         return "127.0.0.1"
 
-def showTips():
+def showTips(port):
     print("")
     print('----------------------------------------------------------------------->> ')
-    try:
-        port = int(sys.argv[1])
-    except Exception:
-        print('-------->> Warning: Port is not given, will use default port: 8080 ')
-        print('-------->> if you want to use another port, please execute: ')
-        print('-------->> python SimpleHTTPServerWithUpload.py port ')
-        port = 8080
-
-    if not 0 < port < 65535:
-        port = 8080
-
     print(f'-------->> Now, listening at port {port}...')
     osType = platform.system()
     if osType == "Linux":
@@ -43,18 +33,6 @@ def showTips():
         print(f'-------->> You can visit the URL: http://127.0.0.1:{port}')
     print('----------------------------------------------------------------------->> ')
     print("")
-    return ('', port)
-
-
-serveraddr = showTips()
-shareDir = os.getcwd()
-
-try:
-    shareDir = sys.argv[2]
-    print('share dir is ' + shareDir)
-except Exception:
-    print('did not set share dir, use current dir ' + shareDir)
-
 
 def sizeof_fmt(num):
     for x in ['bytes', 'KB', 'MB', 'GB']:
@@ -72,76 +50,20 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
 
     server_version = "SimpleHTTPWithUpload/" + __version__
 
-    def do_POST(self):
-        """Serve a POST request."""
-        r, info = self.deal_post_data()
-        print(r, info, "by: ", self.client_address)
-        f = BytesIO()
-        f.write(b'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
-        f.write(b"<html>\n<title>Upload Result Page</title>\n")
-        f.write(b"<body>\n<h2>Upload Result Page</h2>\n")
-        f.write(b"<hr>\n")
-        if r:
-            f.write(b"<strong>Success:</strong>")
-        else:
-            f.write(b"<strong>Failed:</strong>")
-        f.write(info.encode())
-        f.write(b"<br><a href='%s'>back</a>" % self.headers['referer'].encode())
-        f.write(b"<hr><small>Powered By: bones7456, check new version at ")
-        f.write(b"<a href='http://li2z.cn/?s=SimpleHTTPServerWithUpload'>")
-        f.write(b"here</a>.</small></body>\n</html>\n")
-        length = f.tell()
-        f.seek(0)
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.send_header("Content-Length", str(length))
-        self.end_headers()
-        self.wfile.write(f.getvalue())
+    def translate_path(self, path):
+        """Override to serve from the custom directory."""
+        # Use the shareDir (custom directory) instead of the current working directory
+        path = urllib.parse.unquote(path)
+        path = path.split('?', 1)[0]
+        path = path.split('#', 1)[0]
+        trailing_slash = path.rstrip().endswith('/')
+        path = os.path.normpath(path)
 
-    def deal_post_data(self):
-        boundary = self.headers.get_boundary()
-        remainbytes = int(self.headers['content-length'])
-        line = self.rfile.readline()
-        remainbytes -= len(line)
-        if not boundary.encode() in line:
-            return (False, "Content NOT begin with boundary")
-        line = self.rfile.readline()
-        remainbytes -= len(line)
-        fn = re.findall(r'Content-Disposition.*name="file"; filename="(.*)"', line.decode('utf-8'))
-        if not fn:
-            return (False, "Can't find out file name...")
-        path = shareDir + self.path
-        fn = os.path.join(path, fn[0])
-
-        while os.path.exists(fn):
-            fn += "_"
-
-        line = self.rfile.readline()
-        remainbytes -= len(line)
-        line = self.rfile.readline()
-        remainbytes -= len(line)
-
-        try:
-            out = open(fn, 'wb')
-        except IOError:
-            return (False, "Can't create file to write, do you have permission to write?")
-
-        preline = self.rfile.readline()
-        remainbytes -= len(preline)
-        while remainbytes > 0:
-            line = self.rfile.readline()
-            remainbytes -= len(line)
-            if boundary.encode() in line:
-                preline = preline[0:-1]
-                if preline.endswith(b'\r'):
-                    preline = preline[0:-1]
-                out.write(preline)
-                out.close()
-                return (True, f"File '{fn}' upload success!")
-            else:
-                out.write(preline)
-                preline = line
-        return (False, "Unexpected end of data.")
+        # Map the requested path to the shared directory
+        full_path = os.path.join(shareDir, path.lstrip('/'))
+        if os.path.isdir(full_path) and trailing_slash:
+            return full_path + '/'
+        return full_path
 
     def list_directory(self, path):
         """Helper to produce a directory listing (absent index.html)."""
@@ -198,6 +120,16 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Simple HTTP Server with Upload.')
+    parser.add_argument('port', type=int, nargs='?', default=8080, help='Port to listen on (default: 8080)')
+    parser.add_argument('-d', '--directory', default=os.getcwd(), help='Directory to share (default: current directory)')
+    args = parser.parse_args()
+
+    shareDir = args.directory
+    serveraddr = ('', args.port)
+
+    showTips(args.port)
     server = ThreadingSimpleServer(serveraddr, SimpleHTTPRequestHandlerWithUpload)
+    print(f"Serving files from directory: {shareDir}")
     print("Starting server, use <Ctrl-C> to stop")
     server.serve_forever()
