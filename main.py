@@ -72,7 +72,7 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         except os.error:
             self.send_error(404, "No permission to list directory")
             return None
-        
+    
         listx.sort(key=lambda a: a.lower())
         f = BytesIO()
         displaypath = html.escape(urllib.parse.unquote(self.path))
@@ -82,38 +82,209 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         if os.path.abspath(path) != os.path.abspath(shareDir):
             parent_dir_link = '<li><a href="../">../</a></li>'
 
-        f.write(b'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
-        f.write(b"<html><head><meta charset='utf-8'><title>%s</title></head>" % displaypath.encode('utf-8'))
-        f.write("<body><h2>文件列表 Directory listing for %s</h2>".encode('utf-8') % displaypath.encode('utf-8'))
-        f.write(b"<hr><form ENCTYPE='multipart/form-data' method='post'>")
-        f.write(b"<input name='file' type='file'/><input type='submit' value='")
-        f.write('上传Upload'.encode('utf-8'))  # Encode non-ASCII characters
-        f.write(b"'/></form>")
+    
+        # Beautified HTML layout
+        f.write(b'<!DOCTYPE html>')
+        f.write(b"<html><head><meta charset='utf-8'><title> %s</title>" % displaypath.encode('utf-8'))
+        f.write(b"<style>")
+        f.write(b"body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }")
+        f.write(b".container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }")
+        f.write(b"h2 { color: #333; }")
+        f.write(b"ul { list-style-type: none; padding-left: 0; }")
+        f.write(b"li { margin: 8px 0; }")
+        f.write(b"a { text-decoration: none; color: #2196F3; }")
+        f.write(b"a:hover { text-decoration: underline; }")
+        f.write(b".file-link { display: flex; justify-content: space-between; }")
+        f.write(b".file-size { color: #666; }")
+        f.write(b"</style></head>")
+        f.write(b"<body><div class='container'>")
+        f.write("<h2>文件列表 / Directory listing for %s</h2>".encode('utf-8') % displaypath.encode('utf-8'))
+        f.write(b"<form ENCTYPE='multipart/form-data' method='post' id='uploadForm'>")
+        f.write("<input name='file' type='file'/><input type='submit' value='上传Upload'/>".encode('utf-8'))
+        f.write(b"</form>")
+        f.write(b"<div id='progressContainer' style='display:none;'>")
+        f.write(b"<p>Upload Progress: <span id='progressPercent'>0%</span></p>")
+        f.write(b"<progress id='progressBar' value='0' max='100'></progress>")
+        f.write(b"</div>")
+        f.write(b"<hr>")
+
+        # JavaScript for progress bar
+        f.write(b"<script>")
+        f.write(b"""
+            const form = document.getElementById('uploadForm');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressContainer = document.getElementById('progressContainer');
+        
+            form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    const formData = new FormData(form);
+    const xhr = new XMLHttpRequest();
+
+    xhr.open('POST', window.location.href, true);
+
+    // Track upload progress
+    xhr.upload.onprogress = function(event) {
+        if (event.lengthComputable) {
+            const percentComplete = Math.round((event.loaded / event.total) * 100);
+            progressBar.value = percentComplete;
+            progressPercent.textContent = percentComplete + '%';
+        }
+    };
+
+    // Show progress bar when upload starts
+    xhr.onloadstart = function() {
+        progressContainer.style.display = 'block';
+    };
+
+    // Handle the server response when upload completes
+    xhr.onloadend = function() {
+        if (xhr.status === 200) {
+            progressBar.value = 100;
+            progressPercent.textContent = '100%';
+
+            // Replace the entire page content with the server's response
+            document.open();
+            document.write(xhr.responseText);  // Replace the current page with the success page
+            document.close();
+        } else {
+            alert('Upload failed, please try again.');
+        }
+    };
+
+    // Send form data
+    xhr.send(formData);
+});
+
+        """)
+        f.write(b"</script>")
         f.write(b"<hr><ul>")
+    
 
         # Write the parent directory link if available
         if parent_dir_link:
             f.write(parent_dir_link.encode('utf-8'))
 
+    
         for name in listx:
             fullname = os.path.join(path, name)
             displayname = linkname = name
+            file_size = ''
             if os.path.isdir(fullname):
                 linkname = name + "/"
                 displayname = name + "/"
             if os.path.islink(fullname):
                 displayname = name + "@"
-            f.write(b'<li><a href="%s">%s</a></li>' % (urllib.parse.quote(linkname).encode('utf-8'), html.escape(displayname).encode('utf-8')))
-        
-        f.write(b"</ul><hr></body></html>")
+            else:
+                file_size = sizeof_fmt(os.path.getsize(fullname)) if os.path.isfile(fullname) else ''
+    
+            f.write(b'<li class="file-link"><a href="%s">%s</a><span class="file-size">%s</span></li>' % (
+                urllib.parse.quote(linkname).encode('utf-8'),
+                html.escape(displayname).encode('utf-8'),
+                file_size.encode('utf-8')
+            ))
+    
+        f.write(b"</ul><hr></div></body></html>")
         length = f.tell()
         f.seek(0)
         self.send_response(200)
-        self.send_header("Content-type", "text/html")
+        self.send_header("Content-type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(length))
         self.end_headers()
         return f
-
+    
+    
+    def do_POST(self):
+        """Serve a POST request to handle file upload with progress tracking."""
+        content_type = self.headers.get('Content-Type')
+        if not content_type or 'multipart/form-data' not in content_type:
+            self.send_error(501, "Unsupported method (POST)")
+            return
+    
+        boundary = content_type.split("=")[1].encode('utf-8')
+        remainbytes = int(self.headers['Content-length'])
+        total_bytes = remainbytes  # Save total bytes to calculate progress
+        line = self.rfile.readline()
+        remainbytes -= len(line)
+        if boundary not in line:
+            self.send_error(400, "Content does not start with boundary")
+            return
+    
+        line = self.rfile.readline()
+        remainbytes -= len(line)
+        fn = re.findall(r'Content-Disposition.*name="file"; filename="(.*)"', line.decode('utf-8'))
+        if not fn:
+            self.send_error(400, "Can't find out file name")
+            return
+        path = self.translate_path(self.path)
+        fn = os.path.join(path, fn[0])
+        line = self.rfile.readline()
+        remainbytes -= len(line)
+        line = self.rfile.readline()
+        remainbytes -= len(line)
+    
+        try:
+            with open(fn, 'wb') as out:
+                preline = self.rfile.readline()
+                remainbytes -= len(preline)
+                while remainbytes > 0:
+                    line = self.rfile.readline()
+                    remainbytes -= len(line)
+    
+                    # Calculate upload progress
+                    uploaded_bytes = total_bytes - remainbytes
+                    progress = (uploaded_bytes / total_bytes) * 100
+    
+                    # Here you could send progress to the client via some method
+                    # (but for now, we'll just print it on the server-side)
+                    print(f"Upload progress: {progress:.2f}%")
+    
+                    if boundary in line:
+                        preline = preline[0:-1]
+                        if preline.endswith(b'\r'):
+                            preline = preline[0:-1]
+                        out.write(preline)
+                        break
+                    else:
+                        out.write(preline)
+                        preline = line
+    
+            # Return the beautified success page with correct back link
+            self.send_response(200)
+            self.send_header("Content-type", "text/html; charset=utf-8")
+            self.end_headers()
+    
+            response = BytesIO()
+            response.write(b"<!DOCTYPE html>")
+            response.write(b"<html><head><meta charset='utf-8'>")
+            response.write(b"<title>Upload Success</title>")
+            response.write(b"<style>")
+            response.write(b"body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }")
+            response.write(b".container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }")
+            response.write(b"h1 { color: #4CAF50; }")
+            response.write(b"p { font-size: 1.2em; }")
+            response.write(b"a { text-decoration: none; color: #2196F3; }")
+            response.write(b"a:hover { text-decoration: underline; }")
+            response.write(b"</style></head>")
+            response.write(b"<body><div class='container'>")
+            response.write("<h1>Upload Success! 上传成功！</h1>".encode('utf-8'))
+            response.write(b"<p>Your file has been successfully uploaded.</p>")
+            response.write("<p>您的文件已成功上传。</p>".encode('utf-8'))
+            response.write(b"<hr>")
+    
+            # Set the back link to the current directory instead of root
+            back_link = html.escape(self.path)
+            response.write("<p><a href='%s'>Back to the file list / 返回文件列表</a></p>".encode('utf-8') % back_link.encode('utf-8'))
+            response.write(b"</div></body></html>")
+    
+            length = response.tell()
+            response.seek(0)
+            self.wfile.write(response.read())
+    
+        except IOError:
+            self.send_error(500, "Failed to write file")
+    
+    
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
