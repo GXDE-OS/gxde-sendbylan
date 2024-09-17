@@ -195,7 +195,7 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
     
     
     def do_POST(self):
-        """Serve a POST request to handle file upload with progress tracking."""
+        """Serve a POST request to handle file upload without progress tracking."""
         content_type = self.headers.get('Content-Type')
         if not content_type or 'multipart/form-data' not in content_type:
             self.send_error(501, "Unsupported method (POST)")
@@ -203,7 +203,6 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
     
         boundary = content_type.split("=")[1].encode('utf-8')
         remainbytes = int(self.headers['Content-length'])
-        total_bytes = remainbytes  # Save total bytes to calculate progress
         line = self.rfile.readline()
         remainbytes -= len(line)
         if boundary not in line:
@@ -222,7 +221,7 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         remainbytes -= len(line)
         line = self.rfile.readline()
         remainbytes -= len(line)
-    
+
         try:
             with open(fn, 'wb') as out:
                 preline = self.rfile.readline()
@@ -230,15 +229,7 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
                 while remainbytes > 0:
                     line = self.rfile.readline()
                     remainbytes -= len(line)
-    
-                    # Calculate upload progress
-                    uploaded_bytes = total_bytes - remainbytes
-                    progress = (uploaded_bytes / total_bytes) * 100
-    
-                    # Here you could send progress to the client via some method
-                    # (but for now, we'll just print it on the server-side)
-                    print(f"Upload progress: {progress:.2f}%")
-    
+                    
                     if boundary in line:
                         preline = preline[0:-1]
                         if preline.endswith(b'\r'):
