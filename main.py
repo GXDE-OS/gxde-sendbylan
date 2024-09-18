@@ -11,26 +11,67 @@ import re
 import mimetypes
 import html
 import threading
+import socket
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 from io import BytesIO
 import argparse
 
-__version__ = "0.1"
+__version__ = "0.2"
+import fcntl
+import struct
 
-class GetWanIp:
-    def getip(self):
-        return "127.0.0.1"
 
+def get_interface_ip(ifname, family):
+    """Retrieve the IP address associated with a network interface."""
+    s = socket.socket(family, socket.SOCK_DGRAM)
+    try:
+        if family == socket.AF_INET:  # IPv4
+            return socket.inet_ntoa(fcntl.ioctl(
+                s.fileno(),
+                0x8915,  # SIOCGIFADDR for IPv4
+                struct.pack('256s', bytes(ifname[:15], 'utf-8'))
+            )[20:24])
+        elif family == socket.AF_INET6:  # IPv6
+            return socket.inet_ntop(
+                socket.AF_INET6,
+                fcntl.ioctl(
+                    s.fileno(),
+                    0x8915,  # SIOCGIFADDR for IPv6 might need to be different
+                    struct.pack('256s', bytes(ifname[:15], 'utf-8'))
+                )[20:36]
+            )
+    except IOError:
+        return None
+
+def list_all_ips():
+    """List all IP addresses for all network interfaces (IPv4 and IPv6)."""
+    addresses = []
+    interfaces = socket.if_nameindex()
+
+    for interface in interfaces:
+        # Get IPv4 address for the interface
+        ipv4 = get_interface_ip(interface[1], socket.AF_INET)
+        if ipv4 and ipv4 != '127.0.0.1':
+            addresses.append((interface[1], ipv4, 'IPv4'))
+
+        # Get IPv6 address for the interface
+        ipv6 = get_interface_ip(interface[1], socket.AF_INET6)
+        if ipv6 and not ipv6.startswith('fe80'):  # Filter out link-local addresses
+            addresses.append((interface[1], ipv6, 'IPv6'))
+
+    return addresses
 def showTips(port):
     print("")
     print('----------------------------------------------------------------------->> ')
     print(f'-------->> Now, listening at port {port}...')
     osType = platform.system()
-    if osType == "Linux":
-        print(f'-------->> You can visit the URL: http://{GetWanIp().getip()}:{port}')
-    else:
-        print(f'-------->> You can visit the URL: http://127.0.0.1:{port}')
+
+    # List all IP addresses
+    print('-------->> Available IP addresses:')
+    for interface, ip, version in list_all_ips():
+        print(f"-------->> {interface} ({version}): http://{ip}:{port}")
+    
     print('----------------------------------------------------------------------->> ')
     print("")
 
@@ -41,32 +82,26 @@ def sizeof_fmt(num):
         num /= 1024.0
     return "%3.1f%s" % (num, 'TB')
 
-
 def modification_date(filename):
     return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(os.path.getmtime(filename)))
 
-
 class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
-
     server_version = "SimpleHTTPWithUpload/" + __version__
 
     def translate_path(self, path):
         """Override to serve from the custom directory."""
-        # Use the shareDir (custom directory) instead of the current working directory
         path = urllib.parse.unquote(path)
         path = path.split('?', 1)[0]
         path = path.split('#', 1)[0]
         trailing_slash = path.rstrip().endswith('/')
         path = os.path.normpath(path)
 
-        # Map the requested path to the shared directory
         full_path = os.path.join(shareDir, path.lstrip('/'))
         if os.path.isdir(full_path) and trailing_slash:
             return full_path + '/'
         return full_path
 
     def list_directory(self, path):
-        """Helper to produce a directory listing (absent index.html)."""
         try:
             listx = os.listdir(path)
         except os.error:
@@ -82,7 +117,6 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         if os.path.abspath(path) != os.path.abspath(shareDir):
             parent_dir_link = '<li><a href="../">../</a></li>'
 
-    
         # Beautified HTML layout
         f.write(b'<!DOCTYPE html>')
         f.write(b"<html><head><meta charset='utf-8'><title> %s</title>" % displaypath.encode('utf-8'))
@@ -160,12 +194,10 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         f.write(b"</script>")
         f.write(b"<hr><ul>")
     
-
         # Write the parent directory link if available
         if parent_dir_link:
             f.write(parent_dir_link.encode('utf-8'))
 
-    
         for name in listx:
             fullname = os.path.join(path, name)
             displayname = linkname = name
@@ -192,94 +224,90 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(length))
         self.end_headers()
         return f
-    
-    
-    def do_POST(self):
-        """Serve a POST request to handle file upload without progress tracking."""
-        content_type = self.headers.get('Content-Type')
-        if not content_type or 'multipart/form-data' not in content_type:
-            self.send_error(501, "Unsupported method (POST)")
-            return
-    
-        boundary = content_type.split("=")[1].encode('utf-8')
-        remainbytes = int(self.headers['Content-length'])
-        line = self.rfile.readline()
-        remainbytes -= len(line)
-        if boundary not in line:
-            self.send_error(400, "Content does not start with boundary")
-            return
-    
-        line = self.rfile.readline()
-        remainbytes -= len(line)
-        fn = re.findall(r'Content-Disposition.*name="file"; filename="(.*)"', line.decode('utf-8'))
-        if not fn:
-            self.send_error(400, "Can't find out file name")
-            return
-        path = self.translate_path(self.path)
-        fn = os.path.join(path, fn[0])
-        line = self.rfile.readline()
-        remainbytes -= len(line)
-        line = self.rfile.readline()
-        remainbytes -= len(line)
 
-        try:
-            with open(fn, 'wb') as out:
-                preline = self.rfile.readline()
-                remainbytes -= len(preline)
-                while remainbytes > 0:
-                    line = self.rfile.readline()
-                    remainbytes -= len(line)
-                    
-                    if boundary in line:
-                        preline = preline[0:-1]
-                        if preline.endswith(b'\r'):
-                            preline = preline[0:-1]
-                        out.write(preline)
-                        break
-                    else:
-                        out.write(preline)
-                        preline = line
+    def do_POST(self):
+           """Serve a POST request to handle file upload without progress tracking."""
+           content_type = self.headers.get('Content-Type')
+           if not content_type or 'multipart/form-data' not in content_type:
+               self.send_error(501, "Unsupported method (POST)")
+               return
     
-            # Return the beautified success page with correct back link
-            self.send_response(200)
-            self.send_header("Content-type", "text/html; charset=utf-8")
-            self.end_headers()
+           boundary = content_type.split("=")[1].encode('utf-8')
+           remainbytes = int(self.headers['Content-length'])
+           line = self.rfile.readline()
+           remainbytes -= len(line)
+           if boundary not in line:
+               self.send_error(400, "Content does not start with boundary")
+               return
     
-            response = BytesIO()
-            response.write(b"<!DOCTYPE html>")
-            response.write(b"<html><head><meta charset='utf-8'>")
-            response.write(b"<title>Upload Success</title>")
-            response.write(b"<style>")
-            response.write(b"body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }")
-            response.write(b".container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }")
-            response.write(b"h1 { color: #4CAF50; }")
-            response.write(b"p { font-size: 1.2em; }")
-            response.write(b"a { text-decoration: none; color: #2196F3; }")
-            response.write(b"a:hover { text-decoration: underline; }")
-            response.write(b"</style></head>")
-            response.write(b"<body><div class='container'>")
-            response.write("<h1>Upload Success! 上传成功！</h1>".encode('utf-8'))
-            response.write(b"<p>Your file has been successfully uploaded.</p>")
-            response.write("<p>您的文件已成功上传。</p>".encode('utf-8'))
-            response.write(b"<hr>")
+           line = self.rfile.readline()
+           remainbytes -= len(line)
+           fn = re.findall(r'Content-Disposition.*name="file"; filename="(.*)"', line.decode('utf-8'))
+           if not fn:
+               self.send_error(400, "Can't find out file name")
+               return
+           path = self.translate_path(self.path)
+           fn = os.path.join(path, fn[0])
+           line = self.rfile.readline()
+           remainbytes -= len(line)
+           line = self.rfile.readline()
+           remainbytes -= len(line)
     
-            # Set the back link to the current directory instead of root
-            back_link = html.escape(self.path)
-            response.write("<p><a href='%s'>Back to the file list / 返回文件列表</a></p>".encode('utf-8') % back_link.encode('utf-8'))
-            response.write(b"</div></body></html>")
-    
-            length = response.tell()
-            response.seek(0)
-            self.wfile.write(response.read())
-    
-        except IOError:
-            self.send_error(500, "Failed to write file")
-    
-    
+           try:
+               with open(fn, 'wb') as out:
+                   preline = self.rfile.readline()
+                   remainbytes -= len(preline)
+                   while remainbytes > 0:
+                       line = self.rfile.readline()
+                       remainbytes -= len(line)
+                       
+                       if boundary in line:
+                           preline = preline[0:-1]
+                           if preline.endswith(b'\r'):
+                               preline = preline[0:-1]
+                           out.write(preline)
+                           break
+                       else:
+                           out.write(preline)
+                           preline = line
+        
+                # Return the beautified success page with correct back link
+               self.send_response(200)
+               self.send_header("Content-type", "text/html; charset=utf-8")
+               self.end_headers()
+        
+               response = BytesIO()
+               response.write(b"<!DOCTYPE html>")
+               response.write(b"<html><head><meta charset='utf-8'>")
+               response.write(b"<title>Upload Success</title>")
+               response.write(b"<style>")
+               response.write(b"body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }")
+               response.write(b".container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }")
+               response.write(b"h1 { color: #4CAF50; }")
+               response.write(b"p { font-size: 1.2em; }")
+               response.write(b"a { text-decoration: none; color: #2196F3; }")
+               response.write(b"a:hover { text-decoration: underline; }")
+               response.write(b"</style></head>")
+               response.write(b"<body><div class='container'>")
+               response.write("<h1>Upload Success! 上传成功！</h1>".encode('utf-8'))
+               response.write(b"<p>Your file has been successfully uploaded.</p>")
+               response.write("<p>您的文件已成功上传。</p>".encode('utf-8'))
+               response.write(b"<hr>")
+        
+                # Set the back link to the current directory instead of root
+               back_link = html.escape(self.path)
+               response.write("<p><a href='%s'>Back to the file list / 返回文件列表</a></p>".encode('utf-8') % back_link.encode('utf-8'))
+               response.write(b"</div></body></html>")
+       
+               length = response.tell()
+               response.seek(0)
+               self.wfile.write(response.read())
+       
+           except IOError:
+               self.send_error(500, "Failed to write file")
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
-    pass
-
+    address_family = socket.AF_INET6  # Support IPv6
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Simple HTTP Server with Upload.')
@@ -288,7 +316,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     shareDir = args.directory
-    serveraddr = ('', args.port)
+    serveraddr = ('::', args.port)  # Listen on all IPv6 interfaces
 
     showTips(args.port)
     server = ThreadingSimpleServer(serveraddr, SimpleHTTPRequestHandlerWithUpload)
