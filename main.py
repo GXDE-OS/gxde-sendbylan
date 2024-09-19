@@ -82,8 +82,7 @@ def sizeof_fmt(num):
         num /= 1024.0
     return "%3.1f%s" % (num, 'TB')
 
-def modification_date(filename):
-    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(os.path.getmtime(filename)))
+
 
 class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
     server_version = "SimpleHTTPWithUpload/" + __version__
@@ -107,7 +106,7 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         except os.error:
             self.send_error(404, "No permission to list directory")
             return None
-    
+
         listx.sort(key=lambda a: a.lower())
         f = BytesIO()
         displaypath = html.escape(urllib.parse.unquote(self.path))
@@ -117,86 +116,49 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         if os.path.abspath(path) != os.path.abspath(shareDir):
             parent_dir_link = '<li><a href="../">../</a></li>'
 
-        # Beautified HTML layout
-        f.write(b'<!DOCTYPE html>')
-        f.write(b"<html><head><meta charset='utf-8'><title> %s</title>" % displaypath.encode('utf-8'))
-        f.write(b"<style>")
-        f.write(b"body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }")
-        f.write(b".container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }")
-        f.write(b"h2 { color: #333; }")
-        f.write(b"ul { list-style-type: none; padding-left: 0; }")
-        f.write(b"li { margin: 8px 0; }")
-        f.write(b"a { text-decoration: none; color: #2196F3; }")
-        f.write(b"a:hover { text-decoration: underline; }")
-        f.write(b".file-link { display: flex; justify-content: space-between; }")
-        f.write(b".file-size { color: #666; }")
-        f.write(b"</style></head>")
-        f.write(b"<body><div class='container'>")
-        f.write("<h2>文件列表 / Directory listing for %s</h2>".encode('utf-8') % displaypath.encode('utf-8'))
-        f.write(b"<form ENCTYPE='multipart/form-data' method='post' id='uploadForm'>")
-        f.write("<input name='file' type='file'/><input type='submit' value='上传Upload'/>".encode('utf-8'))
-        f.write(b"</form>")
-        f.write(b"<div id='progressContainer' style='display:none;'>")
-        f.write(b"<p>Upload Progress: <span id='progressPercent'>0%</span></p>")
-        f.write(b"<progress id='progressBar' value='0' max='100'></progress>")
-        f.write(b"</div>")
-        f.write(b"<hr>")
+        # Beautified HTML layout with header
+        f.write(b'\t<!DOCTYPE html>\n')
+        f.write(b"\t<html><head><meta charset='utf-8'><title> %s</title>\n" % displaypath.encode('utf-8'))
+        f.write(b"\t<style>\n")
+        f.write(b"\tbody { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }\n")
+        f.write(b"\t.container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }\n")
+        f.write(b"\th2 { color: #333; }\n")
+        f.write(b"\tul { list-style-type: none; padding-left: 0; margin: 0; }\n")
+        f.write(b"\tli { margin: 8px 0; display: flex; justify-content: space-between; padding: 8px 0; }\n")
+        f.write(b"\tli:nth-child(odd) { background-color: #f9f9f9; }\n")  # Add alternating row colors
+        f.write(b"\tli a { text-decoration: none; color: #2196F3; }\n")  # Link color for file/folder names
+        f.write(b"\tli a:hover { text-decoration: underline; }\n")  # Hover effect for file/folder names
+        f.write(b"\tli:hover { background-color: #e0f7fa; }\n")  # Hover effect for the entire list item
+        f.write(b"\t.file-size { color: #666; }\n")
+        f.write(b"\t.file-header { display: flex; justify-content: space-between; font-weight: bold; padding: 8px 0; border-bottom: 2px solid #ddd; color: #2196F3; }\n")
+        f.write(b"\t#progressContainer { margin-top: 20px; display: none; }\n")  # Hide progress bar by default
+        f.write(b"\tfooter { margin-top: 20px; text-align: center; color: #666; }\n")  # Footer styling
+        f.write(b"\tfooter a { color: #2196F3; text-decoration: none; }\n")  # Footer link color
+        f.write(b"\tfooter a:hover { text-decoration: underline; }\n")  # Footer link hover effect
+        f.write(b"\t</style></head>\n")
+        f.write(b"\t<body><div class='container'>\n")
+        f.write("\t<h2>文件列表 / Directory listing for %s</h2>\n".encode('utf-8') % displaypath.encode('utf-8'))
+        f.write(b"\t<form ENCTYPE='multipart/form-data' method='post' id='uploadForm'>\n")
+        f.write("\t<input name='file' type='file'/><input type='submit' value='上传 Upload'/>\n".encode('utf-8'))
+        f.write(b"\t</form>\n")
 
-        # JavaScript for progress bar
-        f.write(b"<script>")
-        f.write(b"""
-            const form = document.getElementById('uploadForm');
-            const progressBar = document.getElementById('progressBar');
-            const progressPercent = document.getElementById('progressPercent');
-            const progressContainer = document.getElementById('progressContainer');
-        
-            form.addEventListener('submit', function(event) {
-    event.preventDefault();
-    const formData = new FormData(form);
-    const xhr = new XMLHttpRequest();
+        # Progress bar container
+        f.write(b"\t<div id='progressContainer'>\n")
+        f.write(b"\t<p>Upload Progress: <span id='progressPercent'>0%</span></p>\n")
+        f.write(b"\t<progress id='progressBar' value='0' max='100'></progress>\n")
+        f.write(b"\t</div>\n")
+        f.write(b"\t<hr>\n")
 
-    xhr.open('POST', window.location.href, true);
+        # Add file list header for Name and Size
+        f.write(b"\t<div class='file-header'>\n")
+        f.write("\t<span>名称 / Name</span><span>大小 / Size</span>\n".encode('utf-8'))
+        f.write(b"\t</div>\n")
 
-    // Track upload progress
-    xhr.upload.onprogress = function(event) {
-        if (event.lengthComputable) {
-            const percentComplete = Math.round((event.loaded / event.total) * 100);
-            progressBar.value = percentComplete;
-            progressPercent.textContent = percentComplete + '%';
-        }
-    };
+        f.write(b"\t<ul>\n")
 
-    // Show progress bar when upload starts
-    xhr.onloadstart = function() {
-        progressContainer.style.display = 'block';
-    };
-
-    // Handle the server response when upload completes
-    xhr.onloadend = function() {
-        if (xhr.status === 200) {
-            progressBar.value = 100;
-            progressPercent.textContent = '100%';
-
-            // Replace the entire page content with the server's response
-            document.open();
-            document.write(xhr.responseText);  // Replace the current page with the success page
-            document.close();
-        } else {
-            alert('Upload failed, please try again.');
-        }
-    };
-
-    // Send form data
-    xhr.send(formData);
-});
-
-        """)
-        f.write(b"</script>")
-        f.write(b"<hr><ul>")
-    
         # Write the parent directory link if available
         if parent_dir_link:
-            f.write(parent_dir_link.encode('utf-8'))
+            f.write(b"\t%s\n" % parent_dir_link.encode('utf-8'))
 
         for name in listx:
             fullname = os.path.join(path, name)
@@ -209,14 +171,72 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
                 displayname = name + "@"
             else:
                 file_size = sizeof_fmt(os.path.getsize(fullname)) if os.path.isfile(fullname) else ''
-    
-            f.write(b'<li class="file-link"><a href="%s">%s</a><span class="file-size">%s</span></li>' % (
+
+            f.write(b"\t<li><a href='%s'>%s</a><span class='file-size'>%s</span></li>\n" % (
                 urllib.parse.quote(linkname).encode('utf-8'),
                 html.escape(displayname).encode('utf-8'),
                 file_size.encode('utf-8')
             ))
-    
-        f.write(b"</ul><hr></div></body></html>")
+
+        f.write(b"\t</ul><hr>\n")
+
+        # Footer with project link
+        f.write(b"\t<footer>\n")
+        f.write("\t<p>项目链接 / Project link: <a href=https://gitee.com/shenmo7192/momo-and-mox-tool-scripts/blob/master/updowner.py>Momo and Mox Tool Scripts</a></p>\n".encode('utf-8'))
+        f.write(b"\t</footer>\n")
+
+        f.write(b"</div></body></html>\n")
+
+        # JavaScript for progress bar
+        f.write(b"\t<script>\n")
+        f.write("""
+            const form = document.getElementById('uploadForm');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressContainer = document.getElementById('progressContainer');
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(form);
+                const xhr = new XMLHttpRequest();
+
+                xhr.open('POST', window.location.href, true);
+
+                // Track upload progress
+                xhr.upload.onprogress = function(event) {
+                    if (event.lengthComputable) {
+                        const percentComplete = Math.round((event.loaded / event.total) * 100);
+                        progressBar.value = percentComplete;
+                        progressPercent.textContent = percentComplete + '%';
+                    }
+                };
+
+                // Show progress bar when upload starts
+                xhr.onloadstart = function() {
+                    progressContainer.style.display = 'block';
+                };
+
+                // Handle the server response when upload completes
+                xhr.onloadend = function() {
+                    if (xhr.status === 200) {
+                        progressBar.value = 100;
+                        progressPercent.textContent = '100%';
+
+                        // Replace the entire page content with the server's response
+                        document.open();
+                        document.write(xhr.responseText);  // Replace the current page with the success page
+                        document.close();
+                    } else {
+                        alert('Upload failed, please try again.');
+                    }
+                };
+
+                // Send form data
+                xhr.send(formData);
+            });
+        """.encode('utf-8'))
+        f.write(b"\t</script>\n")
+
         length = f.tell()
         f.seek(0)
         self.send_response(200)
@@ -225,6 +245,7 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         self.end_headers()
         return f
 
+    
     def do_POST(self):
            """Serve a POST request to handle file upload without progress tracking."""
            content_type = self.headers.get('Content-Type')
