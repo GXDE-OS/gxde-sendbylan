@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QNetworkInterface>
 #include <QList>
+#include <dmainwindow.h>
 
 DWIDGET_USE_NAMESPACE
 
@@ -23,6 +24,8 @@ int main(int argc, char *argv[])
     a.setProductIcon(QIcon(PATH_ICON));  // 设置Logo
     a.setProductName(MAIN_TITLE);
     a.setApplicationName(MAIN_TITLE);  // 只有在这儿修改窗口标题才有效
+
+    DMainWindow tempWindow;
 
     // 检查是否提供了参数
     if (argc < 2) {
