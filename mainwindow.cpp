@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     setMinimumSize(450,350);
     setMaximumSize(450,350);
     setWindowFlags(Qt::WindowStaysOnTopHint);
+    setWindowFlags( (windowFlags() | Qt::CustomizeWindowHint) & ~Qt::WindowMaximizeButtonHint); // https://segmentfault.com/q/1010000042762264 最大化按钮隐藏
 //    QMenu *fileMenu;
 //    QString file="文件";
 //    fileMenu = menuBar()->addAction(file);

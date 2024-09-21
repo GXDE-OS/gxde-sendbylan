@@ -16,6 +16,7 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 from io import BytesIO
 import argparse
+import re
 
 __version__ = "0.2"
 import fcntl
@@ -86,6 +87,56 @@ def sizeof_fmt(num):
 
 class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
     server_version = "SimpleHTTPWithUpload/" + __version__
+    def send_head(self):
+        """Override the default method to handle Range requests."""
+        path = self.translate_path(self.path)
+        if os.path.isdir(path):
+            return self.list_directory(path)
+        
+        try:
+            file = open(path, 'rb')
+        except OSError:
+            self.send_error(404, "File not found")
+            return None
+
+        file_size = os.path.getsize(path)
+        range_header = self.headers.get('Range')
+
+        if range_header:
+            # Parsing the Range header, e.g., bytes=500-999
+            range_match = re.match(r"bytes=(\d+)-(\d*)", range_header)
+            if range_match:
+                start = int(range_match.group(1))
+                end = range_match.group(2)
+                end = int(end) if end else file_size - 1
+
+                if start >= file_size:
+                    self.send_error(416, "Requested Range Not Satisfiable")
+                    self.send_header("Content-Range", f"bytes */{file_size}")
+                    self.end_headers()
+                    return None
+
+                self.send_response(206)
+                self.send_header("Content-Type", self.guess_type(path))
+                self.send_header("Content-Range", f"bytes {start}-{end}/{file_size}")
+                self.send_header("Content-Length", str(end - start + 1))
+                self.send_header("Accept-Ranges", "bytes")
+                self.end_headers()
+
+                # Serve the requested file range
+                file.seek(start)
+                self.wfile.write(file.read(end - start + 1))
+                file.close()
+                return None
+
+        # Default response when no Range request is made (serve the full file)
+        self.send_response(200)
+        self.send_header("Content-Type", self.guess_type(path))
+        self.send_header("Content-Length", str(file_size))
+        self.send_header("Accept-Ranges", "bytes")
+        self.end_headers()
+
+        return file
 
     def translate_path(self, path):
         """Override to serve from the custom directory."""
