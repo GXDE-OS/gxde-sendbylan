@@ -75,7 +75,6 @@ int main(int argc, char *argv[])
     // 写入运行脚本
     std::fstream outhttp;
     outhttp.open("/tmp/http.sh", std::fstream::out);
-    outhttp << "cd /opt/gxde-sendbylan\n";
     outhttp << "/opt/gxde-sendbylan/main.py ";
     outhttp << port;
     outhttp << " -d ";
