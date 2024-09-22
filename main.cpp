@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     a.setAttribute(Qt::AA_UseHighDpiPixmaps);
     a.loadTranslator();
     a.setOrganizationName("GXDE OS");
-    a.setApplicationVersion(DApplication::buildVersion(VERSON));
+    a.setApplicationVersion(DApplication::buildVersion(APP_VERSION));
     a.setApplicationAcknowledgementPage("https://gitee.com/shenmo7192");
     a.setProductIcon(QIcon(PATH_ICON));  // 设置Logo
     a.setProductName(MAIN_TITLE);
