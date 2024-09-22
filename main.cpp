@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
     a.setApplicationAcknowledgementPage("https://gitee.com/shenmo7192");
     a.setProductIcon(QIcon(PATH_ICON));  // 设置Logo
     a.setProductName(MAIN_TITLE);
+    a.setApplicationDescription("GXDE Sendbylan is a super cool and convenient tool for sharing your files by on click \nSpecial thank to Maicss");
+
     a.setApplicationName(MAIN_TITLE);  // 只有在这儿修改窗口标题才有效
 
     DMainWindow tempWindow;
