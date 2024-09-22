@@ -40,3 +40,19 @@ CONFIG += c++11
 FORMS += \
     widget.ui
 include(QRCode/QRCode.pri)
+
+isEmpty(BINDIR):BINDIR=/opt/gxde-sendbylan
+isEmpty(APPDIR):FILEOEMDIR=/usr/share/deepin/dde-file-manager/oem-menuextensions/
+
+target.path = $$INSTROOT$$BINDIR
+
+desktop.path = $$INSTROOT$$FILEOEMDIR
+desktop.files = $$PWD/gxde-sendbylan.desktop
+
+icon.path = $$INSTROOT$$BINDIR
+icon.files = $$PWD/*.svg
+
+serverFile.path = $$INSTROOT$$BINDIR
+serverFile.files = $$PWD/main.py
+
+INSTALLS += target desktop icon serverFile

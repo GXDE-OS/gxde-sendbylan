@@ -1,5 +1,5 @@
 [Desktop Entry]
-Exec=/opt/gxde-sendbylan/SBL %f
+Exec=/opt/gxde-sendbylan/filesend %f
 GenericName=SendByLAN
 GenericName[en]=SendByLAN
 GenericName[zh_CN]=分享到局域网
@@ -7,5 +7,7 @@ MimeType=inode/directory;
 Name=SendByLAN
 Name[en]=SendByLAN
 Name[zh_CN]=分享到局域网
+Icon=/opt/gxde-sendbylan/sendbylan.svg
 Type=Application
 X-Deepin-Vendor=user-custom
+X-DFM-MenuTypes=EmptyArea
