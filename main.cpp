@@ -8,6 +8,7 @@
 #include <QNetworkInterface>
 #include <QList>
 #include <dmainwindow.h>
+#include <QFile>
 
 DWIDGET_USE_NAMESPACE
 
@@ -40,8 +41,8 @@ int main(int argc, char *argv[])
     std::fstream lock;
     lock.open("/tmp/http.sh", std::ios::in);
     if (lock) {
-        if (QMessageBox::critical(nullptr, "无法打开", "我们无法同时分享多个文件夹！\n如果您确信现在并没有运行其他分享，您可以点击NO忽略该警告", QMessageBox::Ok | QMessageBox::Close, QMessageBox::Ok) == QMessageBox::No) {
-            system("rm /tmp/http.sh");
+        if (QMessageBox::critical(nullptr, "无法打开", "我们无法同时分享多个文件夹！\n如果您确信现在并没有运行其他分享，您可以点击忽略来忽略该警告", QMessageBox::Close | QMessageBox::Ignore, QMessageBox::Close) == QMessageBox::Ignore) {
+            QFile::remove("/tmp/http.sh");
         } else {
             return 0;
         }

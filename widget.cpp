@@ -7,6 +7,8 @@
 #include <QString>
 #include "QRCode/qrencode.h"
 #include <QMenu>
+#include <qdesktopservices.h>
+
 // #include <QMenuBar>
 DWIDGET_USE_NAMESPACE
 Widget::Widget(QWidget *parent) :
@@ -135,7 +137,8 @@ QPixmap Widget::createQRCode(const QString &text) //二维码创建函数
 }
 
 
-void Widget::on_pushButton_2_clicked()
+void Widget::on_pushButton_openlink_clicked()
 {
-
+    QString URL = ip_address;
+    QDesktopServices::openUrl(QUrl(URL.toLatin1()));
 }
