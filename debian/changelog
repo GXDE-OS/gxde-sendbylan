@@ -1,7 +1,7 @@
-gxde-sendbylan (1.7.2) UNRELEASED; urgency=medium
+gxde-sendbylan (1.7.2-1) UNRELEASED; urgency=medium
 
   * fix: about dialog. Add: open in terminal. Adjust: change icon
-  * feat: Support filter by type of files
+  * feat: Support filter by type of files(Rolled back)
 
  -- shenmo <shenmo@spark-app.store>  Sun, 22 Sep 2024 12:16:08 +0800
 

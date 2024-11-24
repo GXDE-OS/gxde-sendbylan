@@ -190,7 +190,7 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         f.write(b"\t<body><div class='container'>\n")
         f.write("\t<h2>文件列表 / Directory listing for %s</h2>\n".encode('utf-8') % displaypath.encode('utf-8'))
         f.write(b"\t<form ENCTYPE='multipart/form-data' method='post' id='uploadForm'>\n")
-        f.write("\t<input name='file' type='file' accept='image/jpeg, image/gif, image/png, text/plain, application/zip, application/rar'/><input type='submit' value='上传 Upload'/>\n".encode('utf-8'))
+        f.write("\t<input name='file' type='file'/><input type='submit' value='上传 Upload'/>\n".encode('utf-8'))
         f.write(b"\t</form>\n")
 
         # Progress bar container
