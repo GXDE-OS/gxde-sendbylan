@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     a.setOrganizationName("GXDE OS");
     a.setApplicationVersion(DApplication::buildVersion(APP_VERSION));
     a.setApplicationAcknowledgementPage("https://gitee.com/shenmo7192");
-    a.setProductIcon(QIcon(PATH_ICON));  // 设置Logo
+    a.setProductIcon(QIcon(":/icons/sendbylan.svg"));  // 设置Logo
     a.setProductName(MAIN_TITLE);
     a.setApplicationDescription("GXDE Sendbylan is a super cool and convenient tool for sharing your files by on click \nSpecial thank to Maicss");
 

@@ -1,11 +1,13 @@
-gxde-sendbylan (1.7.2-1) UNRELEASED; urgency=medium
+gxde-sendbylan (1.7.3) UNRELEASED; urgency=medium
 
+  [ shenmo ]
   * fix: about dialog. Add: open in terminal. Adjust: change icon
   * feat: Support filter by type of files(Rolled back)
 
- -- shenmo <shenmo@spark-app.store>  Sun, 22 Sep 2024 12:16:08 +0800
+  [ gfdgd_xi ]
+  * 优化图标读取方式
 
-
+ -- gfdgd_xi <3025613752@qq.com>  Wed, 29 Jan 2025 09:09:27 +0800
 
 gxde-sendbylan (1.7.0) UNRELEASED; urgency=medium
 

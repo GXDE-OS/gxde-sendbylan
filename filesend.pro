@@ -61,3 +61,6 @@ serverFile.path = $$INSTROOT$$BINDIR
 serverFile.files = $$PWD/main.py
 
 INSTALLS += target desktop icon serverFile
+
+RESOURCES += \
+    icon.qrc

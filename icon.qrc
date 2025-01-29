@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>sendbylan.svg</file>
+    </qresource>
+</RCC>
