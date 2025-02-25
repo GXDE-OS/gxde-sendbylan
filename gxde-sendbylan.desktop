@@ -1,5 +1,5 @@
 [Desktop Entry]
-Exec=/opt/gxde-sendbylan/filesend %f
+Exec=/opt/gxde-sendbylan/filesend %p
 GenericName=SendByLAN
 GenericName[en]=SendByLAN
 GenericName[zh_CN]=分享到局域网
