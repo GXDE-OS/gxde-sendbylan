@@ -60,7 +60,13 @@ icon.files = $$PWD/*.svg
 serverFile.path = $$INSTROOT$$BINDIR
 serverFile.files = $$PWD/main.py
 
-INSTALLS += target desktop icon serverFile
+403Page.path = $$INSTROOT$$BINDIR/error
+403Page.files = $$PWD/error/403.html
+
+404Page.path = $$INSTROOT$$BINDIR/error
+404Page.files = $$PWD/error/404.html
+
+INSTALLS += target desktop icon serverFile 403Page 404Page
 
 RESOURCES += \
     icon.qrc

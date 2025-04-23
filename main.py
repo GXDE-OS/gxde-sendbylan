@@ -22,6 +22,7 @@ __version__ = "0.2"
 import fcntl
 import struct
 
+programPath = os.path.split(os.path.realpath(__file__))[0]  # 返回 string
 
 def get_interface_ip(ifname, family):
     """Retrieve the IP address associated with a network interface."""
@@ -96,8 +97,7 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         try:
             file = open(path, 'rb')
         except OSError:
-            self.send_error(404, "File not found")
-            return None
+            return self.error_page(404, "File not found.")
 
         file_size = os.path.getsize(path)
         range_header = self.headers.get('Range')
@@ -151,11 +151,26 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
             return full_path + '/'
         return full_path
 
+    def error_page(self, code: int, defaultText: str):
+        if (not os.path.exists(f"{programPath}/error/{str(code)}.html")):
+            self.send_error(code, defaultText)
+            return None
+        f = BytesIO()
+        with open(f"{programPath}/error/{str(code)}.html", "r") as file:
+            f.write(file.read().encode("utf-8"))
+        length = f.tell()
+        f.seek(0)
+        self.send_response(code)
+        self.send_header("Content-type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(length))
+        self.end_headers()
+        return f
+
     def list_directory(self, path):
         try:
             listx = os.listdir(path)
         except os.error:
-            self.send_error(404, "No permission to list directory")
+            self.error_page(403, "No permission to list directory")
             return None
 
         listx.sort(key=lambda a: a.lower())

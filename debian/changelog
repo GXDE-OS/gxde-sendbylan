@@ -1,4 +1,4 @@
-gxde-sendbylan (1.7.3-1) UNRELEASED; urgency=medium
+gxde-sendbylan (1.7.4) UNRELEASED; urgency=medium
 
   [ shenmo ]
   * fix: about dialog. Add: open in terminal. Adjust: change icon
@@ -7,8 +7,9 @@ gxde-sendbylan (1.7.3-1) UNRELEASED; urgency=medium
 
   [ gfdgd_xi ]
   * 优化图标读取方式
+  * 调整 403、404 页面
 
- -- gfdgd_xi <3025613752@qq.com>  Wed, 29 Jan 2025 09:09:27 +0800
+ -- gfdgd_xi <3025613752@qq.com>  Wed, 23 Apr 2025 21:23:22 +0800
 
 gxde-sendbylan (1.7.0) UNRELEASED; urgency=medium
 
