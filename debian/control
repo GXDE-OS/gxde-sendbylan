@@ -16,6 +16,6 @@ Architecture: any
 Depends:
  ${shlibs:Depends},
  ${misc:Depends},
- dde-file-manager,
+ gxde-file-manager,
  python3
 Description: 可以方便的在局域网分享文件，支持手机扫码下载;在文件夹下右键选择“分享到局域网”即可使用。
