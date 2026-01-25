@@ -53,17 +53,17 @@ Widget::Widget(QWidget *parent) :
     //再次读入端口号
     std::fstream readconfig_port;
     std::string port;
-    readconfig_port.open(config_path+"port",std::ios::in);
+    readconfig_port.open(config_path + "port", std::ios::in);
     if(readconfig_port){
         getline(readconfig_port,port);
     }else {
-        port="8080";
+        port = "8080";
     }
     //读取显示本地局域网IP
     for (int i=0;i<network.size();i++) {
-        ip_address="http://"+QNetworkInterface().allAddresses().at(i).toString()+":"+port.c_str();
-        temp=ip_address.split(".");
-        if(temp[0]=="http://192"){
+        ip_address = "http://"+QNetworkInterface().allAddresses().at(i).toString()+":"+port.c_str();
+        temp = ip_address.split(".");
+        if(temp[0] == "http://192" || temp[0] == "http://10."){
             break;
         }
     }
