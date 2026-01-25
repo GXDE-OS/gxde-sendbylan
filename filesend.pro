@@ -47,12 +47,15 @@ FORMS += \
 include(QRCode/QRCode.pri)
 
 isEmpty(BINDIR):BINDIR=/opt/gxde-sendbylan
-isEmpty(APPDIR):FILEOEMDIR=/usr/share/deepin/dde-file-manager/oem-menuextensions/
-
+isEmpty(APPDIR):FILEOEMDIR=/usr/share/deepin/gxde-file-manager/oem-menuextensions/
+FILEOEMDIRDFM=/usr/share/deepin/dde-file-manager/oem-menuextensions/
 target.path = $$INSTROOT$$BINDIR
 
 desktop.path = $$INSTROOT$$FILEOEMDIR
 desktop.files = $$PWD/gxde-sendbylan.desktop
+
+desktop-dfm.path = $$INSTROOT$$FILEOEMDIRDFM
+desktop-dfm.files = $$PWD/gxde-sendbylan.desktop
 
 icon.path = $$INSTROOT$$BINDIR
 icon.files = $$PWD/*.svg
@@ -66,7 +69,7 @@ serverFile.files = $$PWD/main.py
 404Page.path = $$INSTROOT$$BINDIR/error
 404Page.files = $$PWD/error/404.html
 
-INSTALLS += target desktop icon serverFile 403Page 404Page
+INSTALLS += target desktop desktop-dfm icon serverFile 403Page 404Page
 
 RESOURCES += \
     icon.qrc

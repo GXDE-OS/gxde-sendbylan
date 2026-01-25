@@ -1,4 +1,4 @@
-gxde-sendbylan (1.7.5) UNRELEASED; urgency=medium
+gxde-sendbylan (1.7.5-1) UNRELEASED; urgency=medium
 
   [ shenmo ]
   * fix: about dialog. Add: open in terminal. Adjust: change icon

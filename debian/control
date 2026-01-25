@@ -6,7 +6,6 @@ Rules-Requires-Root: no
 Build-Depends:
  debhelper-compat (= 13),
  qtchooser,
- libdde-file-manager-dev,
  libdtkwidget2-dev,
 Standards-Version: 4.6.2
 Homepage: https://gitee.com/GXDE-OS/gxde-sendbylan
@@ -16,6 +15,6 @@ Architecture: any
 Depends:
  ${shlibs:Depends},
  ${misc:Depends},
- gxde-file-manager,
+ gxde-file-manager | dde-file-manager (>=5.0),
  python3
 Description: 可以方便的在局域网分享文件，支持手机扫码下载;在文件夹下右键选择“分享到局域网”即可使用。
