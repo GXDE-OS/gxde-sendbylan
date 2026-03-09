@@ -8,12 +8,14 @@
 #include "QRCode/qrencode.h"
 #include <QMenu>
 #include <qdesktopservices.h>
+#include <QDir>
 
 // #include <QMenuBar>
 DWIDGET_USE_NAMESPACE
-Widget::Widget(QWidget *parent) :
+Widget::Widget(const QString &folder, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Widget)
+    ui(new Ui::Widget),
+    folderPath(folder)
 {
     ui->setupUi(this);
     ui->label->setText("正在加载");
@@ -49,19 +51,23 @@ Widget::Widget(QWidget *parent) :
     //读入配置文件目录
     std::string config_path=getenv("HOME");//读入配置目录
     config_path+="/.config/SBL/";
+    // create config directory if missing
+    QDir cfgDir(QString::fromStdString(config_path));
+    if (!cfgDir.exists())
+        cfgDir.mkpath(".");
 
     //再次读入端口号
     std::fstream readconfig_port;
     std::string port;
     readconfig_port.open(config_path + "port", std::ios::in);
     if(readconfig_port){
-        getline(readconfig_port,port);
+        getline(readconfig_port, port);
     }else {
         port = "8080";
     }
     //读取显示本地局域网IP
     for (int i=0;i<network.size();i++) {
-        ip_address = "http://"+QNetworkInterface().allAddresses().at(i).toString()+":"+port.c_str();
+        ip_address = "http://" + QNetworkInterface().allAddresses().at(i).toString() + ":" + port.c_str();
         temp = ip_address.split(".");
         if(temp[0] == "http://192" || temp[0] == "http://10."){
             break;
@@ -141,4 +147,45 @@ void Widget::on_pushButton_openlink_clicked()
 {
     QString URL = ip_address;
     QDesktopServices::openUrl(QUrl(URL.toLatin1()));
+}
+
+void Widget::reloadSettings()
+{
+    // stop current python server
+    system("pkill -f \"python\"");
+    // regenerate http.sh with new port keeping folderPath
+    std::string config_path = getenv("HOME");
+    config_path += "/.config/SBL/";
+    // read port
+    std::fstream readconfig_port;
+    std::string port;
+    readconfig_port.open(config_path + "port", std::ios::in);
+    if (readconfig_port) {
+        getline(readconfig_port, port);
+    } else {
+        port = "8080";
+    }
+    // write new script
+    std::fstream outhttp;
+    outhttp.open("/tmp/http.sh", std::fstream::out);
+    outhttp << "/opt/gxde-sendbylan/main.py ";
+    outhttp << port;
+    outhttp << " -d ";
+    outhttp << folderPath.toStdString();
+    outhttp.close();
+    system("chmod +x /tmp/http.sh");
+    system("/tmp/http.sh&");
+
+    // update displayed ip
+    QList<QHostAddress> network = QNetworkInterface().allAddresses();
+    QStringList temp;
+    for (int i = 0; i < network.size(); i++) {
+        ip_address = "http://" + QNetworkInterface().allAddresses().at(i).toString() + ":" + port.c_str();
+        temp = ip_address.split(".");
+        if (temp[0] == "http://192" || temp[0] == "http://10.") {
+            break;
+        }
+    }
+    ui->label_3->setText(ip_address);
+    ui->label->setPixmap(createQRCode(ip_address));
 }

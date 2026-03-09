@@ -16,12 +16,16 @@ class Widget : public QWidget
     Q_OBJECT
 
 public:
-    explicit Widget(QWidget *parent = 0);
+    explicit Widget(const QString &folder, QWidget *parent = 0);
     QPixmap createQRCode(const QString &text);
     QString ip_address;
+    QString folderPath;                     // path being shared
     ~Widget();
 
     QStringList getIpList();
+
+public slots:
+    void reloadSettings();
 private slots:
     void on_pushButton_clicked();
 

@@ -9,6 +9,7 @@
 #include <QList>
 #include <dmainwindow.h>
 #include <QFile>
+#include <QDir>
 
 DWIDGET_USE_NAMESPACE
 
@@ -38,6 +39,12 @@ int main(int argc, char *argv[])
 
     std::string config_path = getenv("HOME");  // 读入配置目录
     config_path += "/.config/SBL/";
+    // make sure configuration directory exists
+    {
+        QDir cfgdir(QString::fromStdString(config_path));
+        if (!cfgdir.exists())
+            cfgdir.mkpath(".");
+    }
 
     // 模拟文件锁
     std::fstream lock;
@@ -88,7 +95,7 @@ int main(int argc, char *argv[])
     outhttp.close();
 
     // 让打开时界面显示在正中
-    MainWindow w;
+    MainWindow w(QString::fromLocal8Bit(argv[1]));
     w.show();
     Dtk::Widget::moveToCenter(&w);
 

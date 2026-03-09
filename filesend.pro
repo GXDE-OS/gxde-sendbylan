@@ -31,11 +31,13 @@ DEFINES += APP_BRANCH=\\\"'$$system(git symbolic-ref --short -q HEAD)'\\\"
 SOURCES += main.cpp\
         mainwindow.cpp \
     widget.cpp \
+    settingsdialog.cpp \
 
 
 HEADERS  += mainwindow.h \
     widget.h \
-    config.h
+    config.h \
+    settingsdialog.h
 
 CONFIG += link_pkgconfig
 PKGCONFIG += dtkwidget

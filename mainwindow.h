@@ -11,11 +11,11 @@ class MainWindow : public DMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = 0);
+    MainWindow(const QString &folder, QWidget *parent = 0);
     ~MainWindow();
 
 private:
-    QWidget *w;
+    Widget *w;
     QMenu *m_menu;
 };
 
