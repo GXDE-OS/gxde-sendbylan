@@ -23,8 +23,8 @@ MainWindow::MainWindow(const QString &folder, QWidget *parent)
     m_menu->addAction(setting);
     titlebar()->setMenu(m_menu);
     connect(setting, &QAction::triggered, this, [=]() {
-        // show advanced settings dialog
-        SettingsDialog dlg(this);
+        // show advanced settings dialog, pass current share folder
+        SettingsDialog dlg(folder, this);
         connect(&dlg, &SettingsDialog::settingsChanged, w, &Widget::reloadSettings);
         dlg.exec();
     });

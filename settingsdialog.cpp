@@ -8,9 +8,10 @@
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
+#include <QCoreApplication>
 
-SettingsDialog::SettingsDialog(QWidget *parent)
-    : QDialog(parent)
+SettingsDialog::SettingsDialog(const QString &folder, QWidget *parent)
+    : QDialog(parent), m_folder(folder)
 {
     setWindowTitle(tr("高级设置"));
 
@@ -97,9 +98,15 @@ void SettingsDialog::saveSettings()
             QTextStream out(&f);
             out << "[Desktop Entry]\n"
                 << "Type=Application\n"
-                << "Name=GXDE Sendbylan\n"
-                << "Exec=/opt/gxde-sendbylan/main\n"
-                << "X-GNOME-Autostart-enabled=true\n";
+                << "Name=GXDE Sendbylan\n";
+            // use the actual executable absolute path
+            QString execPath = QCoreApplication::applicationFilePath();
+            out << "Exec=" << execPath;
+            if (!m_folder.isEmpty()) {
+                out << " " << m_folder;
+            }
+            out << "\n";
+            out << "X-GNOME-Autostart-enabled=true\n";
         }
         f.close();
     } else {
