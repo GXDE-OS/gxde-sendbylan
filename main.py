@@ -205,7 +205,14 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
         f.write(b"\t<body><div class='container'>\n")
         f.write("\t<h2>文件列表 / Directory listing for %s</h2>\n".encode('utf-8') % displaypath.encode('utf-8'))
         f.write(b"\t<form ENCTYPE='multipart/form-data' method='post' id='uploadForm'>\n")
-        f.write("\t<input name='file' type='file'/><input type='submit' value='上传 Upload'/>\n".encode('utf-8'))
+        # separate inputs: one for regular files, one for directories (webkitdirectory)
+        f.write("\t<label>选中文件: <input name='file' type='file' multiple/></label>".encode('utf-8'))
+        f.write("<span style='font-size:0.9em;color:#555;'>&nbsp;（可多选）</span>".encode('utf-8'))
+        f.write(b"<br/>\n")
+        f.write("\t<label>选中文件夹: <input name='file' type='file' webkitdirectory directory multiple/></label>".encode('utf-8'))
+        f.write("<span style='font-size:0.9em;color:#555;'>&nbsp;（仅支持部分浏览器）</span>".encode('utf-8'))
+        f.write(b"<br/>\n")
+        f.write("\t<input type='submit' value='上传 Upload'/>\n".encode('utf-8'))
         f.write(b"\t</form>\n")
 
         # Progress bar container
@@ -264,6 +271,20 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
                 const formData = new FormData(form);
+                
+                // Check for folder paths in regular file inputs
+                const fileInputs = document.querySelectorAll('input[name="file"]');
+                for (let input of fileInputs) {
+                    if (!input.hasAttribute('webkitdirectory')) {
+                        for (let file of input.files) {
+                            if (file.name.includes('/') || file.name.includes('\\\\')) {
+                                alert('检测到文件夹路径，请使用文件夹选择控件上传文件夹。');
+                                return;
+                            }
+                        }
+                    }
+                }
+                
                 const xhr = new XMLHttpRequest();
 
                 xhr.open('POST', window.location.href, true);
@@ -293,7 +314,7 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
                         document.write(xhr.responseText);  // Replace the current page with the success page
                         document.close();
                     } else {
-                        alert('Upload failed, please try again.');
+                        alert('Upload failed: ' + xhr.status + ' - ' + xhr.responseText);
                     }
                 };
 
@@ -313,85 +334,87 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
 
     
     def do_POST(self):
-           """Serve a POST request to handle file upload without progress tracking."""
-           content_type = self.headers.get('Content-Type')
-           if not content_type or 'multipart/form-data' not in content_type:
-               self.send_error(501, "Unsupported method (POST)")
-               return
-    
-           boundary = content_type.split("=")[1].encode('utf-8')
-           remainbytes = int(self.headers['Content-length'])
-           line = self.rfile.readline()
-           remainbytes -= len(line)
-           if boundary not in line:
-               self.send_error(400, "Content does not start with boundary")
-               return
-    
-           line = self.rfile.readline()
-           remainbytes -= len(line)
-           fn = re.findall(r'Content-Disposition.*name="file"; filename="(.*)"', line.decode('utf-8'))
-           if not fn:
-               self.send_error(400, "Can't find out file name")
-               return
-           path = self.translate_path(self.path)
-           fn = os.path.join(path, fn[0])
-           line = self.rfile.readline()
-           remainbytes -= len(line)
-           line = self.rfile.readline()
-           remainbytes -= len(line)
-    
-           try:
-               with open(fn, 'wb') as out:
-                   preline = self.rfile.readline()
-                   remainbytes -= len(preline)
-                   while remainbytes > 0:
-                       line = self.rfile.readline()
-                       remainbytes -= len(line)
-                       
-                       if boundary in line:
-                           preline = preline[0:-1]
-                           if preline.endswith(b'\r'):
-                               preline = preline[0:-1]
-                           out.write(preline)
-                           break
-                       else:
-                           out.write(preline)
-                           preline = line
-        
-                # Return the beautified success page with correct back link
-               self.send_response(200)
-               self.send_header("Content-type", "text/html; charset=utf-8")
-               self.end_headers()
-        
-               response = BytesIO()
-               response.write(b"<!DOCTYPE html>")
-               response.write(b"<html><head><meta charset='utf-8'>")
-               response.write(b"<title>Upload Success</title>")
-               response.write(b"<style>")
-               response.write(b"body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }")
-               response.write(b".container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }")
-               response.write(b"h1 { color: #4CAF50; }")
-               response.write(b"p { font-size: 1.2em; }")
-               response.write(b"a { text-decoration: none; color: #2196F3; }")
-               response.write(b"a:hover { text-decoration: underline; }")
-               response.write(b"</style></head>")
-               response.write(b"<body><div class='container'>")
-               response.write("<h1>Upload Success! 上传成功！</h1>".encode('utf-8'))
-               response.write(b"<p>Your file has been successfully uploaded.</p>")
-               response.write("<p>您的文件已成功上传。</p>".encode('utf-8'))
-               response.write(b"<hr>")
-        
-                # Set the back link to the current directory instead of root
-               back_link = html.escape(self.path)
-               response.write("<p><a href='%s'>Back to the file list / 返回文件列表</a></p>".encode('utf-8') % back_link.encode('utf-8'))
-               response.write(b"</div></body></html>")
-       
-               length = response.tell()
-               response.seek(0)
-               self.wfile.write(response.read())
-       
-           except IOError:
-               self.send_error(500, "Failed to write file")
+        """Serve a POST request to handle file upload (supports multiple files and directories)."""
+        # use cgi.FieldStorage for robust multipart parsing
+        import cgi
+
+        content_type = self.headers.get('Content-Type')
+        if not content_type or 'multipart/form-data' not in content_type:
+            self.send_error(501, "Unsupported method (POST)")
+            return
+
+        # parse the form data
+        fs = cgi.FieldStorage(fp=self.rfile,
+                              headers=self.headers,
+                              environ={'REQUEST_METHOD': 'POST'},
+                              keep_blank_values=True)
+
+        files = fs['file'] if 'file' in fs else None
+        if not files:
+            self.send_error(400, "No file fields found in POST")
+            return
+
+        if not isinstance(files, list):
+            files = [files]
+
+        path = self.translate_path(self.path)
+        saved = []
+        for item in files:
+            filename = item.filename
+            if not filename:
+                continue
+            # sanitize and preserve subdirectory structure
+            filename = os.path.normpath(filename)
+            if filename.startswith(os.sep):
+                filename = filename.lstrip(os.sep)
+
+            dest = os.path.join(path, filename)
+            dest_dir = os.path.dirname(dest)
+            os.makedirs(dest_dir, exist_ok=True)
+            try:
+                with open(dest, 'wb') as out:
+                    out.write(item.file.read())
+                saved.append(dest[len(path)+1:])
+            except IOError:
+                # skip failing file but continue others
+                pass
+
+        # build basic success page (ignoring individual names)
+        self.send_response(200)
+        self.send_header("Content-type", "text/html; charset=utf-8")
+        self.end_headers()
+
+        response = BytesIO()
+        response.write(b"<!DOCTYPE html>")
+        response.write(b"<html><head><meta charset='utf-8'>")
+        response.write(b"<title>Upload Success</title>")
+        response.write(b"<style>")
+        response.write(b"body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }")
+        response.write(b".container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }")
+        response.write(b"h1 { color: #4CAF50; }")
+        response.write(b"p { font-size: 1.2em; }")
+        response.write(b"a { text-decoration: none; color: #2196F3; }")
+        response.write(b"a:hover { text-decoration: underline; }")
+        response.write(b"</style></head>")
+        response.write(b"<body><div class='container'>")
+        response.write("<h1>Upload Success! 上传成功！</h1>".encode('utf-8'))
+        response.write(b"<p>Your file(s) have been successfully uploaded.</p>")
+        response.write("<p>您的文件已成功上传。</p>".encode('utf-8'))
+        if saved:
+            response.write(b"<ul>")
+            for fname in saved:
+                response.write(f"<li>{html.escape(fname)}</li>".encode('utf-8'))
+            response.write(b"</ul>")
+        response.write(b"<hr>")
+
+        back_link = html.escape(self.path)
+        response.write("<p><a href='%s'>Back to the file list / 返回文件列表</a></p>".encode('utf-8') % back_link.encode('utf-8'))
+        response.write(b"</div></body></html>")
+
+        length = response.tell()
+        response.seek(0)
+        self.wfile.write(response.read())
+
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     address_family = socket.AF_INET6  # Support IPv6
