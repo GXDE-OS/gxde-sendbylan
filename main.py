@@ -266,7 +266,7 @@ HTML_TEMPLATE_BASE = """<!DOCTYPE html>
         {content}
     </div>
     <footer class="footer">
-        <p>GXDE SendByLan v{version} | <a href="https://gitee.com/shenmo7192/gxde-sendbylan">开源项目</a></p>
+        <p>GXDE SendByLan v{version} | <a href="https://gitee.com/shenmo7192/momo-and-mox-tool-scripts/blob/master/updowner.py">开源项目</a></p>
     </footer>
     {scripts}
 </body>
