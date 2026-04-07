@@ -1,10 +1,9 @@
-gxde-sendbylan (1.7.7) UNRELEASED; urgency=medium
+gxde-sendbylan (1.7.6) UNRELEASED; urgency=medium
 
   [ shenmo ]
   * fix: about dialog. Add: open in terminal. Adjust: change icon
   * feat: Support filter by type of files(Rolled back)
   * Support Newer DFM
-  * 优化了界面
 
   [ gfdgd_xi ]
   * 优化图标读取方式
