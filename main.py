@@ -20,7 +20,7 @@ from io import BytesIO
 import argparse
 import re
 
-__version__ = "0.2"
+__version__ = "1.7.8"
 import fcntl
 import struct
 
