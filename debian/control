@@ -6,7 +6,12 @@ Rules-Requires-Root: no
 Build-Depends:
  debhelper-compat (= 13),
  qtchooser,
- libdtkwidget2-dev,
+ pkg-config,
+ qt6-base-dev,
+ libdtk2widget6-dev,
+ qt6-tools-dev,
+ libdtk6gui-dev,
+ cmake
 Standards-Version: 4.6.2
 Homepage: https://gitee.com/GXDE-OS/gxde-sendbylan
 

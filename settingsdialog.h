@@ -11,7 +11,6 @@ class SettingsDialog : public QDialog
 {
     Q_OBJECT
 public:
-    // folder being shared is needed for autostart Exec line
     explicit SettingsDialog(const QString &folder, QWidget *parent = nullptr);
     ~SettingsDialog();
 
@@ -27,7 +26,7 @@ private:
     QPushButton *m_ok;
     QPushButton *m_cancel;
 
-    QString m_folder; // absolute path of shared directory
+    QString m_folder;
 
     QString configPath() const;
     QString autostartFilePath() const;

@@ -11,7 +11,7 @@ class MainWindow : public DMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(const QString &folder, QWidget *parent = 0);
+    MainWindow(const QString &folder, QWidget *parent = nullptr);
     ~MainWindow();
 
 private:

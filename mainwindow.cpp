@@ -17,18 +17,17 @@ MainWindow::MainWindow(const QString &folder, QWidget *parent)
     setMinimumSize(450,350);
     setMaximumSize(450,350);
     setWindowFlags(Qt::WindowStaysOnTopHint);
-    setWindowFlags( (windowFlags() | Qt::CustomizeWindowHint) & ~Qt::WindowMaximizeButtonHint); // https://segmentfault.com/q/1010000042762264 最大化按钮隐藏
-    // add settings menu to titlebar
+    setWindowFlags( (windowFlags() | Qt::CustomizeWindowHint) & ~Qt::WindowMaximizeButtonHint);
     QAction *setting(new QAction(tr("设置"), this));
     m_menu->addAction(setting);
     titlebar()->setMenu(m_menu);
     connect(setting, &QAction::triggered, this, [=]() {
-        // show advanced settings dialog, pass current share folder
         SettingsDialog dlg(folder, this);
         connect(&dlg, &SettingsDialog::settingsChanged, w, &Widget::reloadSettings);
         dlg.exec();
     });
 }
+
 MainWindow::~MainWindow()
 {
 

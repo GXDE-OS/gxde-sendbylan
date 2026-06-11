@@ -7,11 +7,9 @@
 #include <QString>
 #include "QRCode/qrencode.h"
 #include <QMenu>
-#include <qdesktopservices.h>
+#include <QDesktopServices>
 #include <QDir>
 
-// #include <QMenuBar>
-DWIDGET_USE_NAMESPACE
 Widget::Widget(const QString &folder, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget),
@@ -19,28 +17,18 @@ Widget::Widget(const QString &folder, QWidget *parent) :
 {
     ui->setupUi(this);
     ui->label->setText("正在加载");
-//    QAction setting;
-//    setting.setText("设置");
-//    ui->
-//    QMenu * setting_menu;
-//    setting_menu=QMenuBar(this).addAction(&setting);
-//    addAction(&setting);
-//    setting_menu=QMenuBar().addAction(QString::fromLocal8Bit("设置"));
 
-    //加载ok图标
     QString strPath = "ok.svg";
     QSvgRenderer* svgRender = new QSvgRenderer();
     svgRender->load(strPath);
     QPixmap* pixmap = new QPixmap(130,130);
-    pixmap->fill(Qt::transparent);//设置背景透明
+    pixmap->fill(Qt::transparent);
     QPainter p(pixmap);
     svgRender->render(&p);
 
-    //运行运行脚本
     system("chmod +x /tmp/http.sh");
     system("/tmp/http.sh&");
 
-    //显示
     ui->label->setPixmap(*pixmap);
     ui->label->setAlignment(Qt::AlignHCenter);
     ui->label->show();
@@ -48,15 +36,12 @@ Widget::Widget(const QString &folder, QWidget *parent) :
     QList<QHostAddress> network;
     network = QNetworkInterface().allAddresses();
     QStringList temp;
-    //读入配置文件目录
-    std::string config_path=getenv("HOME");//读入配置目录
+    std::string config_path=getenv("HOME");
     config_path+="/.config/SBL/";
-    // create config directory if missing
     QDir cfgDir(QString::fromStdString(config_path));
     if (!cfgDir.exists())
         cfgDir.mkpath(".");
 
-    //再次读入端口号
     std::fstream readconfig_port;
     std::string port;
     readconfig_port.open(config_path + "port", std::ios::in);
@@ -65,7 +50,6 @@ Widget::Widget(const QString &folder, QWidget *parent) :
     }else {
         port = "8080";
     }
-    //读取显示本地局域网IP
     for (int i=0;i<network.size();i++) {
         ip_address = "http://" + QNetworkInterface().allAddresses().at(i).toString() + ":" + port.c_str();
         temp = ip_address.split(".");
@@ -92,7 +76,7 @@ void Widget::on_pushButton_clicked()
       clipboard->setText(ip_address);
 }
 
-QPixmap Widget::createQRCode(const QString &text) //二维码创建函数
+QPixmap Widget::createQRCode(const QString &text)
 {
     int margin = 2;
     if (text.length() == 0)
@@ -151,12 +135,9 @@ void Widget::on_pushButton_openlink_clicked()
 
 void Widget::reloadSettings()
 {
-    // stop current python server
     system("pkill -f \"python\"");
-    // regenerate http.sh with new port keeping folderPath
     std::string config_path = getenv("HOME");
     config_path += "/.config/SBL/";
-    // read port
     std::fstream readconfig_port;
     std::string port;
     readconfig_port.open(config_path + "port", std::ios::in);
@@ -165,7 +146,6 @@ void Widget::reloadSettings()
     } else {
         port = "8080";
     }
-    // write new script
     std::fstream outhttp;
     outhttp.open("/tmp/http.sh", std::fstream::out);
     outhttp << "/opt/gxde-sendbylan/main.py ";
@@ -176,7 +156,6 @@ void Widget::reloadSettings()
     system("chmod +x /tmp/http.sh");
     system("/tmp/http.sh&");
 
-    // update displayed ip
     QList<QHostAddress> network = QNetworkInterface().allAddresses();
     QStringList temp;
     for (int i = 0; i < network.size(); i++) {

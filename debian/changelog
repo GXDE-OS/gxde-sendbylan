@@ -1,11 +1,12 @@
-gxde-sendbylan (1.7.8-1) UNRELEASED; urgency=medium
+gxde-sendbylan (2.0.0) UNRELEASED; urgency=medium
 
   [ gfdgd_xi ]
   * 修复 Python 3.13 环境下上传失败的问题
   * 优化上传页与上传结果页的展示样式
   * 新增上传回归测试，覆盖普通文件和目录结构上传
+  * Qt6 迁移
 
- -- gfdgd_xi <3025613752@qq.com>  Sat, 25 Apr 2026 16:50:00 +0800
+ -- gfdgd_xi <3025613752@qq.com>  Thu, 11 Jun 2026 21:43:55 +0800
 
 gxde-sendbylan (1.7.7-1) UNRELEASED; urgency=medium
 

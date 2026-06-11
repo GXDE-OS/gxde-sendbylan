@@ -58,7 +58,6 @@ QString SettingsDialog::autostartFilePath() const {
 
 void SettingsDialog::loadSettings()
 {
-    // load port
     QFile portFile(configPath() + "port");
     if (portFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QByteArray line = portFile.readLine().trimmed();
@@ -71,14 +70,12 @@ void SettingsDialog::loadSettings()
     }
     portFile.close();
 
-    // load autostart state
     QFile autoFile(autostartFilePath());
     m_autostart->setChecked(autoFile.exists());
 }
 
 void SettingsDialog::saveSettings()
 {
-    // save port
     QFile portFile(configPath() + "port");
     if (portFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&portFile);
@@ -86,20 +83,17 @@ void SettingsDialog::saveSettings()
     }
     portFile.close();
 
-    // handle autostart
     QFile autoFile(autostartFilePath());
     if (m_autostart->isChecked()) {
         QDir dir(QDir::homePath() + "/.config/autostart/");
         if (!dir.exists())
             dir.mkpath(".");
-        // create using path string to avoid copying QFile
         QFile f(autostartFilePath());
         if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
             QTextStream out(&f);
             out << "[Desktop Entry]\n"
                 << "Type=Application\n"
                 << "Name=GXDE Sendbylan\n";
-            // use the actual executable absolute path
             QString execPath = QCoreApplication::applicationFilePath();
             out << "Exec=" << execPath;
             if (!m_folder.isEmpty()) {

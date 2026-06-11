@@ -5,8 +5,7 @@
 #include <string>
 #include "config.h"
 #include <QMenu>
-#include <DMainWindow>
-DWIDGET_USE_NAMESPACE
+
 namespace Ui {
 class Widget;
 }
@@ -16,10 +15,10 @@ class Widget : public QWidget
     Q_OBJECT
 
 public:
-    explicit Widget(const QString &folder, QWidget *parent = 0);
+    explicit Widget(const QString &folder, QWidget *parent = nullptr);
     QPixmap createQRCode(const QString &text);
     QString ip_address;
-    QString folderPath;                     // path being shared
+    QString folderPath;
     ~Widget();
 
     QStringList getIpList();
