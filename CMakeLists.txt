@@ -106,7 +106,7 @@ install(FILES ok.svg sendbylan.svg
     DESTINATION ${BINDIR}
 )
 
-install(FILES main.py
+install(PROGRAMS main.py
     DESTINATION ${BINDIR}
 )
 
