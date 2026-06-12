@@ -11,7 +11,8 @@ Build-Depends:
  libdtk2widget6-dev,
  qt6-tools-dev,
  libdtk6gui-dev,
- cmake
+ cmake, 
+ qt6-svg-dev
 Standards-Version: 4.6.2
 Homepage: https://gitee.com/GXDE-OS/gxde-sendbylan
 
