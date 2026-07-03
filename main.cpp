@@ -21,7 +21,8 @@ int main(int argc, char *argv[])
     a.setOrganizationName("GXDE OS");
     a.setApplicationVersion(DApplication::buildVersion(APP_VERSION));
     a.setApplicationAcknowledgementPage("https://gitee.com/GXDE-OS/gxde-sendbylan");
-    a.setProductIcon(QIcon(":/icons/sendbylan.svg"));
+    // 修复关于图标不显示的问题
+    a.setProductIcon(QIcon("/opt/gxde-sendbylan/sendbylan.svg"));
     a.setProductName(MAIN_TITLE);
     a.setApplicationDescription("GXDE Sendbylan is a super cool and convenient tool for sharing your files by on click \nSpecial thank to Maicss");
     a.setApplicationName(MAIN_TITLE);
