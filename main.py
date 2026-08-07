@@ -116,6 +116,142 @@ def sanitize_upload_name(filename):
     return normalized
 
 
+def stream_multipart(rfile, content_length, boundary, dest_dir):
+    """
+    Stream multipart form data from rfile in chunks, writing each file
+    directly to disk without loading the whole body into memory.
+
+    Returns (saved_filenames, skipped_filenames).
+    """
+    CHUNK_SIZE = 65536
+
+    boundary_bytes = boundary.encode("utf-8")
+    boundary_separator = b"\r\n--" + boundary_bytes + b"\r\n"
+    boundary_final = b"\r\n--" + boundary_bytes + b"--\r\n"
+    boundary_first = b"--" + boundary_bytes + b"\r\n"
+
+    saved = []
+    skipped = []
+
+    buffer = b""
+    bytes_read = 0
+    state = "init"
+    current_file = None
+    current_filename = None
+
+    def read_more():
+        nonlocal bytes_read, buffer
+        if bytes_read >= content_length:
+            return False
+        chunk = rfile.read(min(CHUNK_SIZE, content_length - bytes_read))
+        if not chunk:
+            return False
+        bytes_read += len(chunk)
+        buffer += chunk
+        return True
+
+    try:
+        read_more()
+
+        while state != "done":
+            if state == "init":
+                if len(buffer) >= len(boundary_first):
+                    if buffer.startswith(boundary_first):
+                        buffer = buffer[len(boundary_first):]
+                        state = "headers"
+                    else:
+                        break
+                elif not read_more():
+                    break
+
+            elif state == "headers":
+                sep_idx = buffer.find(b"\r\n\r\n")
+                if sep_idx != -1:
+                    headers_raw = buffer[:sep_idx].decode("utf-8", errors="replace")
+                    buffer = buffer[sep_idx + 4:]
+
+                    filename = None
+                    for line in headers_raw.split("\r\n"):
+                        if line.lower().startswith("content-disposition:"):
+                            match = re.search(r'filename="([^"]*)"', line)
+                            if match:
+                                filename = match.group(1)
+                            break
+
+                    sanitized = sanitize_upload_name(filename) if filename else None
+                    if sanitized:
+                        current_filename = sanitized
+                        dest = os.path.join(dest_dir, sanitized)
+                        os.makedirs(os.path.dirname(dest), exist_ok=True)
+                        current_file = open(dest, 'wb')
+                    else:
+                        current_filename = filename
+                        current_file = None
+
+                    state = "content"
+                elif not read_more():
+                    break
+
+            elif state == "content":
+                sep_pos = buffer.find(boundary_separator)
+                final_pos = buffer.find(boundary_final)
+
+                if sep_pos != -1 and (final_pos == -1 or sep_pos < final_pos):
+                    if current_file:
+                        current_file.write(buffer[:sep_pos])
+                        current_file.close()
+                        dest = os.path.join(dest_dir, current_filename)
+                        saved.append(dest[len(dest_dir) + 1:])
+                    elif current_filename:
+                        skipped.append(current_filename)
+
+                    buffer = buffer[sep_pos + len(boundary_separator):]
+                    state = "headers"
+
+                elif final_pos != -1:
+                    if current_file:
+                        current_file.write(buffer[:final_pos])
+                        current_file.close()
+                        dest = os.path.join(dest_dir, current_filename)
+                        saved.append(dest[len(dest_dir) + 1:])
+                    elif current_filename:
+                        skipped.append(current_filename)
+
+                    state = "done"
+
+                else:
+                    min_keep = max(len(boundary_separator), len(boundary_final))
+                    if len(buffer) > min_keep:
+                        safe_write = len(buffer) - min_keep
+                        if current_file:
+                            current_file.write(buffer[:safe_write])
+                        buffer = buffer[safe_write:]
+                    if not read_more():
+                        if current_file:
+                            current_file.write(buffer)
+                            current_file.close()
+                            dest = os.path.join(dest_dir, current_filename)
+                            saved.append(dest[len(dest_dir) + 1:])
+                        elif current_filename:
+                            skipped.append(current_filename)
+                        break
+
+        if state == "content" and buffer:
+            if current_file:
+                current_file.write(buffer)
+                current_file.close()
+                dest = os.path.join(dest_dir, current_filename)
+                saved.append(dest[len(dest_dir) + 1:])
+            elif current_filename:
+                skipped.append(current_filename)
+
+    except Exception:
+        if current_file:
+            current_file.close()
+        raise
+
+    return saved, skipped
+
 
 class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
     server_version = "SimpleHTTPWithUpload/" + __version__
@@ -392,30 +528,18 @@ class SimpleHTTPRequestHandlerWithUpload(SimpleHTTPRequestHandler):
             self.send_error(411, "Content-Length header is required")
             return
 
-        body = self.rfile.read(int(content_length))
-        files = parse_uploaded_files(content_type, body)
-        if not files:
-            self.send_error(400, "No file fields found in POST")
+        content_length = int(content_length)
+        boundary_match = re.search(r'boundary=(.+)', content_type)
+        if not boundary_match:
+            self.send_error(400, "Missing boundary in Content-Type")
             return
 
+        boundary = boundary_match.group(1).strip('"')
         path = self.translate_path(self.path)
-        saved = []
-        skipped = []
-        for original_name, file_bytes in files:
-            filename = sanitize_upload_name(original_name)
-            if not filename:
-                skipped.append(original_name)
-                continue
-
-            dest = os.path.join(path, filename)
-            dest_dir = os.path.dirname(dest)
-            os.makedirs(dest_dir, exist_ok=True)
-            try:
-                with open(dest, 'wb') as out:
-                    out.write(file_bytes)
-                saved.append(dest[len(path)+1:])
-            except IOError:
-                skipped.append(original_name)
+        saved, skipped = stream_multipart(self.rfile, content_length, boundary, path)
+        if not saved and not skipped:
+            self.send_error(400, "No file fields found in POST")
+            return
 
         self.send_response(200)
         self.send_header("Content-type", "text/html; charset=utf-8")
