@@ -53,10 +53,10 @@ inline QString port()
     return readValue("port", "8080");
 }
 
-/* 共享协议：webdav（网页+可挂载，推荐）、http（仅网页）、smb */
+/* 共享协议：http（默认，与原行为一致）、webdav（可挂载）、smb */
 inline QString protocol()
 {
-    return readValue("protocol", "webdav");
+    return readValue("protocol", "http");
 }
 
 /* 是否允许接收端在网页里上传文件，默认开启 */

@@ -141,6 +141,9 @@ def test_directory_listing_shows_brand_and_upload_form(tmp_path):
     assert "GXDE Sendbylan" in page
     assert "note.txt" in page
     assert "upload-form" in page
+    # 先选择、点“开始上传”才真正上传
+    assert "upload-start-btn" in page
+    assert 'onchange="updateSelectionHint()"' in page
 
 
 def test_upload_can_be_disabled(tmp_path):

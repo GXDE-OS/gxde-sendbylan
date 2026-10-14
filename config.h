@@ -15,6 +15,6 @@
 
 #define MAIN_TITLE "共享文件夹"
 #define VERSION "1.6"
-#define APP_VERSION "4.1.0"
+#define APP_VERSION "4.1.1"
 
 #endif // CONFIG_H

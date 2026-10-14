@@ -31,7 +31,7 @@ from urllib.parse import quote
 
 FILE_BUFFER_SIZE = 64 * 1024
 SERVER_BRAND = "Erotica WebServer"
-SERVER_VERSION = "v3.2.0"
+SERVER_VERSION = "v3.2.1"
 SERVER_HEADER_NAME = "Erotica-WebServer"
 SMB_DEFAULT_PORT = 445
 SMB_SHARE_FALLBACK = "share"
@@ -303,16 +303,18 @@ def render_directory_listing_html(path, request_path, upload_enabled=False):
     if upload_enabled:
         upload_form = f'''
     <div class="upload-section">
-        <form id="upload-form" enctype="multipart/form-data" method="post" action="{html_escape(encode_href_path(request_path), quote=True)}">
+        <form id="upload-form" enctype="multipart/form-data" method="post" action="{html_escape(encode_href_path(request_path), quote=True)}" onsubmit="return false;">
             <span class="upload-label">上传文件 / Upload:</span>
             <label class="upload-btn" title="选择文件上传">
                 📄 选择文件
-                <input type="file" name="files" multiple="" style="display:none" onchange="handleUpload(this.files)">
+                <input type="file" name="files" multiple="" style="display:none" onchange="updateSelectionHint()">
             </label>
             <label class="upload-btn" title="选择整个目录上传（保持目录结构）">
                 📁 选择目录
-                <input type="file" name="files" webkitdirectory="" directory="" multiple="" style="display:none" onchange="handleUpload(this.files)">
+                <input type="file" name="files" webkitdirectory="" directory="" multiple="" style="display:none" onchange="updateSelectionHint()">
             </label>
+            <button id="upload-start-btn" class="upload-start-btn" type="button" onclick="handleUpload()">开始上传 / Upload</button>
+            <span id="upload-selection" class="upload-selection">未选择文件 / No file selected</span>
         </form>
     </div>
     <div id="upload-progress" class="upload-progress" style="display:none;">
@@ -342,8 +344,48 @@ def render_directory_listing_html(path, request_path, upload_enabled=False):
     upload_script = ''
     if upload_enabled:
         upload_script = '''<script>
-function handleUpload(files) {
-    if (!files || files.length === 0) return;
+function collectSelectedFiles() {
+    // 选择文件与选择目录两个控件里的内容会被一起上传（与老版本行为一致）
+    var inputs = document.querySelectorAll('#upload-form input[type="file"]');
+    var selected = [];
+    for (var i = 0; i < inputs.length; i++) {
+        var files = inputs[i].files;
+        if (!files) continue;
+        for (var j = 0; j < files.length; j++) {
+            selected.push(files[j]);
+        }
+    }
+    return selected;
+}
+
+function formatSize(bytes) {
+    var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    var value = bytes;
+    var unit = 0;
+    while (value >= 1024 && unit < units.length - 1) {
+        value /= 1024;
+        unit++;
+    }
+    return (unit === 0 ? value : value.toFixed(2)) + ' ' + units[unit];
+}
+
+function updateSelectionHint() {
+    var hint = document.getElementById('upload-selection');
+    if (!hint) return;
+    var files = collectSelectedFiles();
+    if (files.length === 0) {
+        hint.textContent = '未选择文件 / No file selected';
+        return;
+    }
+    var total = 0;
+    for (var i = 0; i < files.length; i++) {
+        total += files[i].size;
+    }
+    hint.textContent = '已选择 ' + files.length + ' 个文件（' + formatSize(total) + '），点击“开始上传”上传';
+}
+
+function handleUpload() {
+    var files = collectSelectedFiles();
     var progressWrap = document.getElementById('upload-progress');
     var fill = document.getElementById('upload-progress-fill');
     var percentText = document.getElementById('upload-progress-percent');
@@ -357,6 +399,15 @@ function handleUpload(files) {
     var form = document.getElementById('upload-form');
     var action = form.getAttribute('action') || window.location.pathname;
     var cancelled = false;
+
+    if (files.length === 0) {
+        toast.classList.add('upload-toast-error');
+        toastIcon.textContent = '⚠️';
+        toastMsg.textContent = '请先选择文件 / Please select files first';
+        toast.style.display = 'block';
+        setTimeout(function() { toast.style.display = 'none'; }, 3000);
+        return;
+    }
 
     progressWrap.style.display = 'block';
     toast.style.display = 'none';
@@ -461,6 +512,9 @@ body {{ font-family: Arial, sans-serif; background: #f5f7fa; color: #2a2f36; lin
 .upload-label {{ font-size: 0.92rem; font-weight: 600; color: #2a2f36; }}
 .upload-btn {{ display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; background: #e8f4fd; border: 1px solid #b8d8f0; border-radius: 5px; cursor: pointer; font-size: 0.9rem; color: #2f5f8f; transition: background 0.15s; }}
 .upload-btn:hover {{ background: #d4ebfa; }}
+.upload-start-btn {{ display: inline-flex; align-items: center; padding: 6px 18px; background: #66CCFF; border: 1px solid #4fb8ec; border-radius: 5px; cursor: pointer; font-size: 0.9rem; color: #fff; transition: background 0.15s; }}
+.upload-start-btn:hover {{ background: #3399FF; }}
+.upload-selection {{ font-size: 0.85rem; color: #6c7886; }}
 @media (max-width: 700px) {{
     body {{ padding: 12px; }}
     .table-header {{ display: none; }}

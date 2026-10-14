@@ -1,3 +1,11 @@
+gxde-sendbylan (2.1.1) UNRELEASED; urgency=medium
+
+  [ shenmo ]
+  * 保持原来的默认行为：默认使用网页(http)共享并打开网页上传，WebDAV / SMB 可在高级设置里切换
+  * 跟随 server.py：上传改成“先选择文件、点开始上传才上传”，不再一选文件就上传
+
+ -- shenmo <shenmo@spark-app.store>  Wed, 14 Oct 2026 19:10:00 +0800
+
 gxde-sendbylan (2.1.0) UNRELEASED; urgency=medium
 
   [ shenmo ]

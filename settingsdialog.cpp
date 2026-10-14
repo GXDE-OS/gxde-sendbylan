@@ -23,9 +23,9 @@ SettingsDialog::SettingsDialog(const QString &folder, QWidget *parent)
     m_portSpin->setSuffix(tr(" 端口"));
 
     m_protocolBox = new QComboBox(this);
-    // data 里的值就是传给 server.py -p 的参数
-    m_protocolBox->addItem(tr("网页 + WebDAV（推荐，可挂载为网络位置）"), QStringLiteral("webdav"));
-    m_protocolBox->addItem(tr("仅网页浏览 / 下载 / 上传"), QStringLiteral("http"));
+    // data 里的值就是传给 server.py -p 的参数；默认第一项与老版本行为一致
+    m_protocolBox->addItem(tr("网页浏览 / 下载 / 上传（默认，与原行为一致）"), QStringLiteral("http"));
+    m_protocolBox->addItem(tr("网页 + WebDAV（可再挂载为网络位置）"), QStringLiteral("webdav"));
     m_protocolBox->addItem(tr("SMB 共享（Windows 可直接访问，需要管理员权限）"), QStringLiteral("smb"));
 
     m_protocolHint = new QLabel(this);
@@ -83,11 +83,11 @@ void SettingsDialog::updateProtocolHint()
     if (isSmb) {
         m_protocolHint->setText(tr("SMB 使用 445 端口时需要 root 权限；若使用其它端口，"
                                    "请在地址后带上端口访问（Windows 资源管理器不支持自定义端口）。"));
-    } else if (current == QLatin1String("http")) {
-        m_protocolHint->setText(tr("只提供网页浏览、下载与上传，不支持挂载为网络位置。"));
-    } else {
-        m_protocolHint->setText(tr("浏览器可直接访问，也可以在文件管理器或手机中"
+    } else if (current == QLatin1String("webdav")) {
+        m_protocolHint->setText(tr("浏览器访问方式不变，另外可以在文件管理器或手机中"
                                    "添加 WebDAV 网络位置（如 KDE/GNOME 文件管理器、ES 文件浏览器）。"));
+    } else {
+        m_protocolHint->setText(tr("只提供网页浏览、下载与上传，接收端打开地址即可使用。"));
     }
 
     m_uploadCheck->setEnabled(!isSmb);
