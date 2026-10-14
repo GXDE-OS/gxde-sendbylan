@@ -31,6 +31,9 @@ private slots:
     void on_pushButton_openlink_clicked();
 
 private:
+    void refreshAddress();
+    void stopServer();
+
     Ui::Widget *ui;
 
 };

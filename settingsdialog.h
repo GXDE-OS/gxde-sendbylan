@@ -3,9 +3,12 @@
 
 #include <QDialog>
 
-class QSpinBox;
 class QCheckBox;
+class QComboBox;
+class QLabel;
+class QLineEdit;
 class QPushButton;
+class QSpinBox;
 
 class SettingsDialog : public QDialog
 {
@@ -19,16 +22,20 @@ signals:
 
 private slots:
     void accept() override;
+    void updateProtocolHint();
 
 private:
     QSpinBox *m_portSpin;
+    QComboBox *m_protocolBox;
+    QLabel *m_protocolHint;
+    QCheckBox *m_uploadCheck;
+    QLineEdit *m_shareNameEdit;
     QCheckBox *m_autostart;
     QPushButton *m_ok;
     QPushButton *m_cancel;
 
     QString m_folder;
 
-    QString configPath() const;
     QString autostartFilePath() const;
     void loadSettings();
     void saveSettings();

@@ -23,4 +23,7 @@ Depends:
  ${misc:Depends},
  gxde-file-manager | dde-file-manager (>=5.0),
  python3
+Suggests: python3-impacket
 Description: 可以方便的在局域网分享文件，支持手机扫码下载;在文件夹下右键选择“分享到局域网”即可使用。
+ 内置 HTTP / WebDAV / SMB 共享服务：接收端可以用浏览器浏览、下载、上传，
+ 也可以把地址挂载成 WebDAV 网络位置或使用 SMB 访问（SMB 需要 python3-impacket）。

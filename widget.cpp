@@ -1,5 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
+#include "sblconfig.h"
 #include <QDebug>
 #include <QNetworkInterface>
 #include <fstream>
@@ -26,48 +27,42 @@ Widget::Widget(const QString &folder, QWidget *parent) :
     QPainter p(pixmap);
     svgRender->render(&p);
 
-    system("chmod +x /tmp/http.sh");
-    system("/tmp/http.sh&");
+    SBL::startServer(folderPath);
 
     ui->label->setPixmap(*pixmap);
     ui->label->setAlignment(Qt::AlignHCenter);
     ui->label->show();
-    ui->label_2->setText("在接受端浏览器中输入：");
-    QList<QHostAddress> network;
-    network = QNetworkInterface().allAddresses();
-    QStringList temp;
-    std::string config_path=getenv("HOME");
-    config_path+="/.config/SBL/";
-    QDir cfgDir(QString::fromStdString(config_path));
-    if (!cfgDir.exists())
-        cfgDir.mkpath(".");
 
-    std::fstream readconfig_port;
-    std::string port;
-    readconfig_port.open(config_path + "port", std::ios::in);
-    if(readconfig_port){
-        getline(readconfig_port, port);
-    }else {
-        port = "8080";
-    }
-    for (int i=0;i<network.size();i++) {
-        ip_address = "http://" + QNetworkInterface().allAddresses().at(i).toString() + ":" + port.c_str();
-        temp = ip_address.split(".");
-        if(temp[0] == "http://192" || temp[0] == "http://10."){
-            break;
-        }
-    }
-
-    ui->label_3->setText(ip_address);
-    ui->label->setPixmap(createQRCode(ip_address));
-
+    refreshAddress();
 }
 
 Widget::~Widget()
 {
-    system("rm /tmp/http.sh");
-    system("pkill -f \"python\"");
+    stopServer();
+    QFile::remove(SBL_LAUNCHER_SCRIPT);
     delete ui;
+}
+
+void Widget::stopServer()
+{
+    // 只结束本程序启动的 server.py，避免误杀系统里其它 python 进程
+    SBL::stopServer();
+}
+
+void Widget::refreshAddress()
+{
+    const QString address = SBL::preferredAddress();
+
+    QString hint = SBL::addressHint();
+    const QString warning = SBL::warningText();
+    if (!warning.isEmpty())
+        hint += "\n" + warning;
+
+    ui->label_2->setText(hint);
+    ip_address = SBL::shareUrl(address, folderPath);
+    ui->label_3->setText(ip_address);
+    ui->label_3->setToolTip(ip_address);
+    ui->label->setPixmap(createQRCode(ip_address));
 }
 
 void Widget::on_pushButton_clicked()
@@ -129,42 +124,12 @@ QPixmap Widget::createQRCode(const QString &text)
 
 void Widget::on_pushButton_openlink_clicked()
 {
-    QString URL = ip_address;
-    QDesktopServices::openUrl(QUrl(URL.toLatin1()));
+    QDesktopServices::openUrl(QUrl(ip_address));
 }
 
 void Widget::reloadSettings()
 {
-    system("pkill -f \"python\"");
-    std::string config_path = getenv("HOME");
-    config_path += "/.config/SBL/";
-    std::fstream readconfig_port;
-    std::string port;
-    readconfig_port.open(config_path + "port", std::ios::in);
-    if (readconfig_port) {
-        getline(readconfig_port, port);
-    } else {
-        port = "8080";
-    }
-    std::fstream outhttp;
-    outhttp.open("/tmp/http.sh", std::fstream::out);
-    outhttp << "/opt/gxde-sendbylan/main.py ";
-    outhttp << port;
-    outhttp << " -d ";
-    outhttp << folderPath.toStdString();
-    outhttp.close();
-    system("chmod +x /tmp/http.sh");
-    system("/tmp/http.sh&");
-
-    QList<QHostAddress> network = QNetworkInterface().allAddresses();
-    QStringList temp;
-    for (int i = 0; i < network.size(); i++) {
-        ip_address = "http://" + QNetworkInterface().allAddresses().at(i).toString() + ":" + port.c_str();
-        temp = ip_address.split(".");
-        if (temp[0] == "http://192" || temp[0] == "http://10.") {
-            break;
-        }
-    }
-    ui->label_3->setText(ip_address);
-    ui->label->setPixmap(createQRCode(ip_address));
+    stopServer();
+    SBL::startServer(folderPath);
+    refreshAddress();
 }

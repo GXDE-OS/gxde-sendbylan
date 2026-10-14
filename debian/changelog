@@ -1,3 +1,17 @@
+gxde-sendbylan (2.1.0) UNRELEASED; urgency=medium
+
+  [ shenmo ]
+  * 共享服务改用 momo-and-mox-tool-scripts 的 server.py，删除仓库内自带的 main.py
+  * 新增 WebDAV 支持：同一个地址既能用浏览器浏览/上传，也能挂载为网络位置
+  * 新增 SMB 共享方式（可选依赖 python3-impacket，445 端口需要 root 权限）
+  * 高级设置新增共享方式、是否允许接收端上传、SMB 共享名
+  * 支持自定义 403/404 错误页与页面品牌名，保持原有的错误页样式
+  * 修复分享目录路径带空格/引号时命令行被拆坏的问题
+  * 修复关闭分享后误杀系统里所有 python 进程的问题，现在只结束后台共享服务
+  * 修复接收端上传文件夹时目录结构丢失的问题
+
+ -- shenmo <shenmo@spark-app.store>  Wed, 14 Oct 2026 19:03:21 +0800
+
 gxde-sendbylan (2.0.4) UNRELEASED; urgency=medium
 
   [ gfdgd_xi ]

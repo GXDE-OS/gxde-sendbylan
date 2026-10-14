@@ -34,3 +34,11 @@
 *.pro.user
 .vscode
 .vscode/*
+
+# Python
+__pycache__/
+*.pyc
+
+# CMake build directories
+build/
+build-*/

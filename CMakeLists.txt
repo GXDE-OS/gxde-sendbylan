@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(gxde-sendbylan VERSION 4.0.0 LANGUAGES CXX C)
+project(gxde-sendbylan VERSION 4.1.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -52,6 +52,7 @@ set(HEADERS
     mainwindow.h
     widget.h
     config.h
+    sblconfig.h
     settingsdialog.h
     ${QRCODE_HEADERS}
 )
@@ -90,6 +91,11 @@ target_link_libraries(gxde-sendbylan PRIVATE
 
 set(BINDIR "/opt/gxde-sendbylan" CACHE PATH "Install directory for binaries")
 
+# 让程序知道 server.py / 图标 / 错误页的实际安装位置
+target_compile_definitions(gxde-sendbylan PRIVATE
+    SBL_INSTALL_DIR="${BINDIR}"
+)
+
 install(TARGETS gxde-sendbylan
     RUNTIME DESTINATION ${BINDIR}
 )
@@ -106,7 +112,8 @@ install(FILES ok.svg sendbylan.svg
     DESTINATION ${BINDIR}
 )
 
-install(PROGRAMS main.py
+# 共享服务来自 momo-and-mox-tool-scripts 的 server.py（HTTP / WebDAV / SMB）
+install(PROGRAMS server.py
     DESTINATION ${BINDIR}
 )
 
